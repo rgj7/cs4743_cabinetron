@@ -26,11 +26,14 @@ public class InventoryController implements ActionListener {
 		} else if(command.equals("Add Part to Parts List")) {
 			PartDetailView partView = new PartDetailView(model, view, model.getLastPartID()); // sets part id to next available id
 			partView.registerListeners(new PartController(model, view, partView));
+		} else if(command.equals("Add Product Template")) {
+			ProductTemplateDetailView prodTempView = new ProductTemplateDetailView(model, view, model.getLastProductTemplateID());
+			prodTempView.registerListeners(new ProductTemplateController(model, view, prodTempView));
 		} else if(command.equals("View All Parts")) {
-			view.showParts();
+			//view.showParts();
 			view.update();
 		} else if(command.equals("View Inventory")) {
-			view.showInventory();
+			//view.showInventory();
 			view.update();
 		}
 	}

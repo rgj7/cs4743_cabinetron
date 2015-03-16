@@ -1,11 +1,10 @@
 package cabinetron3;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 
 import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -15,8 +14,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.border.Border;
 import javax.swing.table.TableColumn;
 
 
@@ -24,12 +23,11 @@ import javax.swing.table.TableColumn;
 public class InventoryListView extends JFrame {	
 
 	private InventoryModel model;
-	private JTable inventoryTable, partsTable;
-	private JScrollPane inventoryScrollPane, partsScrollPane;
-	private JPanel inventoryButtonPanel, partsButtonPanel;
-	private JMenu inventoryMenu, partsMenu;
-	private JLabel titleLabel;
-	private int currentView;
+	private JTable inventoryTable, partsTable, prodTempTable;
+	private JScrollPane inventoryScrollPane, partsScrollPane, prodTempScrollPane;
+	private JPanel inventoryMainPanel, partsMainPanel, prodTempMainPanel, inventoryButtonPanel, partsButtonPanel, prodTempButtonPanel;
+	private JMenu inventoryMenu, partsMenu, prodTempMenu;
+	private JTabbedPane tabbedPane;
 	
 	////////////////
 	// CONSTRUCTOR
@@ -42,12 +40,25 @@ public class InventoryListView extends JFrame {
 		
 		// initialize all GUI components
 		initMenu();
-		initTitle();
 		initInventoryComponents();
 		initPartComponents();
+		initProdTempComponents();
+		initTabs();
+	}
+	
+	public void initTabs() {
+		// initialize tab panel
+		tabbedPane = new JTabbedPane();
 		
-		// default view
-		showInventory();
+		// add main panels to tab
+		tabbedPane.addTab("Inventory", null, inventoryMainPanel, "View inventory");
+		tabbedPane.addTab("Parts", null, partsMainPanel, "View parts list");
+		tabbedPane.addTab("Product Templates", null, prodTempMainPanel, "View product template list");
+		
+		tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
+		
+		// add tab panel to frame
+		add(tabbedPane, BorderLayout.CENTER);
 	}
 	
 	public void initMenu() {
@@ -76,18 +87,22 @@ public class InventoryListView extends JFrame {
 
 		partsMenu.add(addPartMenuItem);
 		partsMenu.add(viewPartsMenuItem);
+		
+		// product template
+		prodTempMenu = new JMenu("Product Templates");
+		menuBar.add(prodTempMenu);
+		
+		JMenuItem addProdTempMenuItem = new JMenuItem("Add Product Template");
+		JMenuItem viewProdTempsMenuItem = new JMenuItem("View All Product Templates");
+		
+		prodTempMenu.add(addProdTempMenuItem);
+		prodTempMenu.add(viewProdTempsMenuItem);
 	}
 	
-	public void initTitle() {
-		// initialize label for title
-		titleLabel = new JLabel();
-		titleLabel.setFont(new Font("Verdana", Font.BOLD, 14));
-		Border titlePadding = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-		titleLabel.setBorder(titlePadding);
-		add(titleLabel, BorderLayout.PAGE_START);
-	}
-	
-	private void initInventoryComponents() {				
+	private void initInventoryComponents() {
+		// initialize main panel for inventory
+		inventoryMainPanel = new JPanel(new BorderLayout());
+		
 		// initialize main inventory table
 		inventoryTable = new JTable(new InventoryTableModel(model));
 		inventoryScrollPane = new JScrollPane(inventoryTable); // for scrolling
@@ -106,14 +121,18 @@ public class InventoryListView extends JFrame {
 		
 		// initialize buttons
 		JButton addItemButton = new JButton("Add Item to Inventory");
-		JButton viewPartsButton = new JButton("View All Parts");
-		
 		inventoryButtonPanel = new JPanel();
 		inventoryButtonPanel.add(addItemButton);
-		inventoryButtonPanel.add(viewPartsButton);
+		
+		// add to main panel
+		inventoryMainPanel.add(inventoryScrollPane, BorderLayout.CENTER);
+		inventoryMainPanel.add(inventoryButtonPanel, BorderLayout.SOUTH);
 	}
 	
 	private void initPartComponents() {
+		// initialize main panel for parts
+		partsMainPanel = new JPanel(new BorderLayout());
+		
 		// initialize main parts table
 		partsTable = new JTable(new PartsTableModel(model));
 		partsScrollPane = new JScrollPane(partsTable); // for scrolling
@@ -132,29 +151,43 @@ public class InventoryListView extends JFrame {
 		
 		// initialize buttons
 		JButton addPartButton = new JButton("Add Part to Parts List");
-		JButton viewInventoryButton = new JButton("View Inventory");
-		
 		partsButtonPanel = new JPanel();
 		partsButtonPanel.add(addPartButton);
-		partsButtonPanel.add(viewInventoryButton);
+		
+		// add to main panel
+		partsMainPanel.add(partsScrollPane, BorderLayout.CENTER);
+		partsMainPanel.add(partsButtonPanel, BorderLayout.SOUTH);
 	}
 	
-	public void showInventory() {
-		titleLabel.setText("Displaying Current Inventory");
-		add(inventoryScrollPane, BorderLayout.CENTER);
-		add(inventoryButtonPanel, BorderLayout.PAGE_END);
-		remove(partsScrollPane);
-		remove(partsButtonPanel);
-		currentView = 1;
-	}
-	
-	public void showParts() {
-		titleLabel.setText("Displaying Parts List");
-		add(partsScrollPane, BorderLayout.CENTER);
-		add(partsButtonPanel, BorderLayout.PAGE_END);
-		remove(inventoryScrollPane);	
-		remove(inventoryButtonPanel);
-		currentView = 2;
+	private void initProdTempComponents() {
+		// initialize main panel for parts
+		prodTempMainPanel = new JPanel(new BorderLayout());
+		
+		// initialize main parts table
+		prodTempTable = new JTable(new ProductTemplateTableModel(model));
+		prodTempScrollPane = new JScrollPane(prodTempTable); // for scrolling
+		
+		// set column widths
+		TableColumn column = null;
+		for (int i = 0; i < InventoryModel.PRODTEMPFIELDS.length; i++) {
+		    column = prodTempTable.getColumnModel().getColumn(i);
+		    if(InventoryModel.PRODTEMPFIELDS[i].equals("PTID")) {
+		    	column.setPreferredWidth(100);
+		    } else if(InventoryModel.PRODTEMPFIELDS[i].equals("NUMBER")) {
+		        column.setPreferredWidth(200);
+		    } else {
+		        column.setPreferredWidth(500);
+		    }
+		}
+		
+		// initialize buttons
+		JButton addProdTempButton = new JButton("Add Product Template");
+		prodTempButtonPanel = new JPanel();
+		prodTempButtonPanel.add(addProdTempButton);
+		
+		// add to main panel
+		prodTempMainPanel.add(prodTempScrollPane, BorderLayout.CENTER);
+		prodTempMainPanel.add(prodTempButtonPanel, BorderLayout.SOUTH);
 	}
 	
 	public void registerListeners(InventoryController controller1, InventoryTableController controller2) {	
@@ -190,9 +223,18 @@ public class InventoryListView extends JFrame {
 			}
 		}
 		
-		// add mouse listener for inventory table
+		components = prodTempButtonPanel.getComponents();
+		for(Component component : components) {
+			if(component instanceof AbstractButton) {
+				AbstractButton button = (AbstractButton) component;
+				button.addActionListener(controller1);
+			}
+		}
+		
+		// add mouse listener to tables
 		inventoryTable.addMouseListener(controller2);
 		partsTable.addMouseListener(controller2);
+		prodTempTable.addMouseListener(controller2);
 	}
 		
 	public int getSelectedItemRow() {
@@ -203,8 +245,12 @@ public class InventoryListView extends JFrame {
 		return this.partsTable.getSelectedRow();
 	}
 	
+	public int getSelectedProdTempRow() {
+		return this.prodTempTable.getSelectedRow();
+	}
+	
 	public int getCurrentView() {
-		return this.currentView;
+		return tabbedPane.getSelectedIndex();
 	}
 
 	// show small pop-up message

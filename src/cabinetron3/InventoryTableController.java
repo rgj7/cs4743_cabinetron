@@ -18,12 +18,15 @@ public class InventoryTableController implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 2) {
-			if(view.getCurrentView() == 1) {
+			if(view.getCurrentView() == 0) { // inventory
 				InventoryItemDetailView itemView = new InventoryItemDetailView(model, view, view.getSelectedItemRow());
 				itemView.registerListeners(new InventoryItemController(model, view, itemView));
-			} else if(view.getCurrentView() == 2) {
+			} else if(view.getCurrentView() == 1) { // parts
 				PartDetailView partView = new PartDetailView(model, view, view.getSelectedPartRow());
 				partView.registerListeners(new PartController(model, view, partView));
+			} else if(view.getCurrentView() == 2) { // product templates
+				ProductTemplateDetailView prodTempView = new ProductTemplateDetailView(model, view, view.getSelectedProdTempRow());
+				prodTempView.registerListeners(new ProductTemplateController(model, view, prodTempView));
 			}
 		}
 	}
