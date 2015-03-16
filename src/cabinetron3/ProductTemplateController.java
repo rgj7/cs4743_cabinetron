@@ -24,7 +24,7 @@ public class ProductTemplateController implements ActionListener {
 		if(command.equals("Add")) {
 			
 			try {
-				//model.addItem(prodTempView.getItemPartNumber(), itemView.getItemLocationIndex(), itemView.getItemQuantity());
+				model.addProductTemplate(prodTempView.getProductTemplateNumber(), prodTempView.getProductTemplateDescription());
 				prodTempView.close();
 				view.update();
 				view.showMessage("Product template was added successfully.");
@@ -35,7 +35,7 @@ public class ProductTemplateController implements ActionListener {
 		} else if(command.equals("Edit")) {
 			
 			try {
-				//model.editItem(itemView.getItemID(), itemView.getItemPartNumber(), itemView.getItemLocationIndex(), itemView.getItemQuantity());
+				//model.editProductTemplate(prodTempView.getProductTemplateID(), prodTempView.getProductTemplateNumber(), prodTempView.getProductTemplateDescription());
 				prodTempView.close();
 				view.update();
 				view.showMessage("Product template was edited successfully.");
@@ -45,7 +45,7 @@ public class ProductTemplateController implements ActionListener {
 			
 		} else if(command.equals("Delete")) {
 			if(view.showWarningMsg("Are you sure you want to delete this product template?") == 0) {
-				//model.deleteItem(itemView.getItemID());
+				//model.deleteProductTemplate(prodTempView.getProductTemplateID());
 			}
 			prodTempView.close();
 			view.update();

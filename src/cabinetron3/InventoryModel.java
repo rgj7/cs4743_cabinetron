@@ -167,6 +167,23 @@ public class InventoryModel {
 		
 	}
 	
+	public void addProductTemplate(String name, String desc) {
+		int id = -1;
+		
+		ProductTemplateModel newProdTemp = new ProductTemplateModel(id, name, desc);
+		newProdTemp.setProductTemplateID(lastProdTempID);
+		productTemplates.add(newProdTemp);
+		
+	}
+	
+	public void editProductTemplate(int prodTempId) {
+		
+	}
+	
+	public void deleteProductTemplate(int prodTempId) {
+		
+	}
+	
 	private boolean isUniqueItem(String partNumber, int locationIndex) { // checks for same part/location
 		for(InventoryItemModel item : inventory) {
 			if(item.getItemPart().getPartNumber().equals(partNumber) && item.getItemLocationIndex() == locationIndex) {

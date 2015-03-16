@@ -1,13 +1,11 @@
 package cabinetron3;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -265,6 +263,7 @@ public class InventoryListView extends JFrame {
 	public void update() {
 		partsTable.revalidate();
 		inventoryTable.revalidate();
+		prodTempTable.revalidate();
 		this.revalidate();
 		this.repaint();
 	}
