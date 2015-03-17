@@ -188,6 +188,29 @@ public class InventoryListView extends JFrame {
 		prodTempMainPanel.add(prodTempButtonPanel, BorderLayout.SOUTH);
 	}
 	
+	public void addProductTemplateTab(int prodTempIndex) {
+		ProductTemplateModel prodTempModel = model.getProdTempByIndex(prodTempIndex);
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		
+		//JTable table = new JTable(new ProductTemplatePartTableModel(model, prodTempIndex));
+		JTable table = new JTable(new PartsTableModel(model));
+		JScrollPane scrollPane = new JScrollPane(table);
+		
+		JButton addPartToProdTemp = new JButton("Add Part to Product Template");
+		JButton editProdTemp = new JButton("Edit Product Template");
+		JButton closeProdTemp = new JButton("Save/Close Product Template");
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(addPartToProdTemp);
+		buttonPanel.add(editProdTemp);
+		buttonPanel.add(closeProdTemp);
+		
+		mainPanel.add(scrollPane, BorderLayout.CENTER);
+		mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+		
+		tabbedPane.add(prodTempModel.getProductTemplateNumber(), mainPanel);
+		tabbedPane.setSelectedComponent(mainPanel);
+	}
+	
 	public void registerListeners(InventoryController controller1, InventoryTableController controller2) {	
 		Component[] components = inventoryMenu.getMenuComponents();
 		for(Component component : components) {

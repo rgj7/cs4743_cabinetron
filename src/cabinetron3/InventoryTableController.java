@@ -25,8 +25,9 @@ public class InventoryTableController implements MouseListener {
 				PartDetailView partView = new PartDetailView(model, view, view.getSelectedPartRow());
 				partView.registerListeners(new PartController(model, view, partView));
 			} else if(view.getCurrentView() == 2) { // product templates
-				ProductTemplateDetailView prodTempView = new ProductTemplateDetailView(model, view, view.getSelectedProdTempRow());
-				prodTempView.registerListeners(new ProductTemplateController(model, view, prodTempView));
+				view.addProductTemplateTab(view.getSelectedProdTempRow());
+				//ProductTemplateDetailView prodTempView = new ProductTemplateDetailView(model, view, view.getSelectedProdTempRow());
+				//prodTempView.registerListeners(new ProductTemplateController(model, view, prodTempView));
 			}
 		}
 	}
