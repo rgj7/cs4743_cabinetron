@@ -34,4 +34,6 @@ public class InventoryController implements ActionListener {
 			view.update();
 		}
 	}
+	
+	
 }

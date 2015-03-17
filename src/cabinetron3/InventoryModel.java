@@ -17,7 +17,7 @@ public class InventoryModel {
 	public InventoryModel(PartTableGateway ptg, ItemTableGateway itg) {
 		this.partGateway = ptg;
 		this.itemGateway = itg;
-		//this.inventory = new ArrayList<InventoryItemModel>();
+		this.inventory = new ArrayList<InventoryItemModel>();
 		
 		//loads parts from database
 		try {
@@ -270,5 +270,24 @@ public class InventoryModel {
 			partNumbers[i] = parts.get(i).getPartNumber();
 		}
 		return partNumbers;
+	}
+	
+	public void reloadInventory(){
+		//loads parts from database
+				try {
+					this.parts = partGateway.loadParts();
+					parts.toString();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
+				try {
+					this.inventory = itemGateway.loadItems();
+				} catch (SQLException e) {
+					System.out.println("load items exception");
+					e.printStackTrace();
+				}
+				this.lastItemID = itemGateway.getLastID() + 1; // TODO: get last item id from database
+				this.lastPartID = partGateway.getLastID() + 1;
 	}
 }
