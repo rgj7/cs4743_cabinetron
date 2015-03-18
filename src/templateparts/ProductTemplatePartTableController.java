@@ -24,7 +24,7 @@ public class ProductTemplatePartTableController implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 2) {
-			ProductTemplatePartDetailView prodTempPartView = new ProductTemplatePartDetailView(prodTempModel, view.getCurrentTable().getSelectedRow());
+			ProductTemplatePartDetailView prodTempPartView = new ProductTemplatePartDetailView(model, prodTempModel, view.getCurrentTable().getSelectedRow());
 			prodTempPartView.registerListeners(new ProductTemplatePartController(model, view, prodTempModel, prodTempPartView));
 		}
 	}

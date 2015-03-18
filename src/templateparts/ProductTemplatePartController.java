@@ -35,7 +35,7 @@ public class ProductTemplatePartController implements ActionListener {
 				view.setCurrentTable(null);
 			}
 		} else if(command.equals("Add Part to Product Template")) {
-			ProductTemplatePartDetailView partView = new ProductTemplatePartDetailView(prodTempModel, -1);
+			ProductTemplatePartDetailView partView = new ProductTemplatePartDetailView(model, prodTempModel, -1);
 			partView.registerListeners(new ProductTemplatePartController(model, view, prodTempModel, partView));
 		} if(command.equals("Add")) {
 			
