@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import parts.PartTableController;
 import parts.PartView;
@@ -125,6 +127,11 @@ public class InventoryView extends JFrame {
 		
 		tabbedPane.add("ProductTemplate: " + prodTempModel.getProductTemplateNumber(), mainPanel);
 		tabbedPane.setSelectedComponent(mainPanel);
+		
+		// disable other tabs
+		tabbedPane.setEnabledAt(0, false);
+		tabbedPane.setEnabledAt(1, false);
+		tabbedPane.setEnabledAt(2, false);
 		
 		// add mouse listener to table
 		table.addMouseListener(new ProductTemplatePartTableController(model, this, prodTempModel));

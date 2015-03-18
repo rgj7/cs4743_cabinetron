@@ -25,6 +25,11 @@ public class ProductTemplatePartController implements ActionListener {
 		String command = event.getActionCommand();
 		if(command.equals("Close Product Template")) {
 			if(view.showWarningMsg("Are you sure you want to close this product template?") == 0) {
+				// enable other tabs
+				view.getTabbedPane().setEnabledAt(0, true);
+				view.getTabbedPane().setEnabledAt(1, true);
+				view.getTabbedPane().setEnabledAt(2, true);
+				// remove product template tab
 				view.getTabbedPane().remove(view.getTabbedPane().getSelectedIndex());
 				view.setCurrentTable(null);
 			}
