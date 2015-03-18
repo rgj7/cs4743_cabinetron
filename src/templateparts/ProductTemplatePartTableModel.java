@@ -1,7 +1,8 @@
-package templates;
+package templateparts;
 
 import javax.swing.table.AbstractTableModel;
 
+import templates.ProductTemplateModel;
 import main.InventoryModel;
 
 @SuppressWarnings("serial")

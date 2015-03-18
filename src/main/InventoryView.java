@@ -19,10 +19,10 @@ import javax.swing.JTable;
 
 import parts.PartTableController;
 import parts.PartView;
+import templateparts.ProductTemplatePartController;
+import templateparts.ProductTemplatePartTableController;
+import templateparts.ProductTemplatePartTableModel;
 import templates.ProductTemplateModel;
-import templates.ProductTemplatePartController;
-import templates.ProductTemplatePartTableController;
-import templates.ProductTemplatePartTableModel;
 import templates.ProductTemplateTableController;
 import templates.ProductTemplateView;
 

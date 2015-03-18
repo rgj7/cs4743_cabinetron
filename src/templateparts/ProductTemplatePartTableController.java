@@ -1,8 +1,9 @@
-package templates;
+package templateparts;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import templates.ProductTemplateModel;
 import main.InventoryModel;
 import main.InventoryView;
 

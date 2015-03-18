@@ -26,8 +26,9 @@ public class ProductTemplateTableController implements MouseListener {
 	public void mouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 2) {
 			String[] options = {"Edit PT", "View PT Parts"};
-			if(JOptionPane.showOptionDialog(null, "Would you like to edit the Product Template or view its parts?", 
-					"Product Template Options", 0, JOptionPane.QUESTION_MESSAGE, null, options, "Edit") == 0) {
+			int result = JOptionPane.showOptionDialog(null, "Would you like to edit the Product Template or view its parts?", 
+					"Product Template Options", 0, JOptionPane.QUESTION_MESSAGE, null, options, "Edit");
+			if(result == 0) {
 				// edit
 				ProductTemplateDetailView prodTempView = new ProductTemplateDetailView(model, view, view.getSelectedProdTempRow());
 				prodTempView.registerListeners(new ProductTemplateController(model, view, prodTempView));

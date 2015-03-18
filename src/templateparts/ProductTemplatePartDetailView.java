@@ -1,4 +1,4 @@
-package templates;
+package templateparts;
 
 import java.awt.Component;
 import java.text.NumberFormat;
@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.NumberFormatter;
 
+import templates.ProductTemplateModel;
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")

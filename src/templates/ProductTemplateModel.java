@@ -2,6 +2,8 @@ package templates;
 
 import java.util.ArrayList;
 
+import templateparts.ProductTemplatePartModel;
+
 public class ProductTemplateModel {
 
 	public static final String[] PARTFIELDS = {"PTID", "PART ID", "PART NAME", "QUANTITY"};

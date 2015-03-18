@@ -1,8 +1,9 @@
-package templates;
+package templateparts;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import templates.ProductTemplateModel;
 import main.InventoryModel;
 import main.InventoryView;
 
