@@ -120,7 +120,7 @@ public class InventoryView extends JFrame {
 		mainPanel.add(scrollPane, BorderLayout.CENTER);
 		mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 		
-		tabbedPane.add(prodTempModel.getProductTemplateNumber(), mainPanel);
+		tabbedPane.add("ProductTemplate: " + prodTempModel.getProductTemplateNumber(), mainPanel);
 		tabbedPane.setSelectedComponent(mainPanel);
 		
 		table.addMouseListener(new ProductTemplatePartTableController(model, this));
