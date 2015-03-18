@@ -37,15 +37,29 @@ public class InventoryItemController implements ActionListener {
 			
 		} else if(command.equals("Edit Item")) {
 			
-			try {
-				model.editItem(itemView.getItemID(), itemView.getItemPartNumber(), itemView.getItemLocationIndex(), itemView.getItemQuantity());
-				itemView.close();
-				view.update();
-				view.showMessage("Item was edited successfully.");
-			} catch(IllegalArgumentException e) {
-				view.showMessage(e.getMessage());
-			}
-			
+			Boolean retry = false;
+			do{
+			   if(retry){
+				   model.reloadInventory();
+				   view.update();
+				   itemView.reload();
+			   }
+				   		   
+			   try {
+				      model.editItem(itemView.getItemID(), itemView.getItemPartNumber(), itemView.getItemLocationIndex(), 
+				    		         itemView.getItemQuantity(), itemView.getTimestamp());
+				      itemView.close();
+				      view.update();
+				      view.showMessage("Item was edited successfully.");
+			   } catch(IllegalArgumentException e) {
+		           view.showMessage(e.getMessage());
+			   }
+			   catch(DatabaseLockException e){
+				   view.showMessage(e.getMessage());
+				   retry = true;
+			   }
+			} while (retry);
+	    	
 		} else if(command.equals("Delete Item")) {
 			if(view.showWarningMsg("Are you sure you want to delete this item?") == 0) {
 				model.deleteItem(itemView.getItemID());

@@ -1,6 +1,7 @@
 package cabinetron3;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class InventoryModel {
@@ -48,6 +49,7 @@ public class InventoryModel {
 	public void addItem(String partNumber, int locationIndex, int quantity) {
 		
 		int id = -1;
+		Timestamp t = null;
 		
 		if(this.isUniqueItem(partNumber, locationIndex)) {
 			PartModel part = getPartByNumber(partNumber);
@@ -58,7 +60,16 @@ public class InventoryModel {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-
+			
+			try {
+				t = this.itemGateway.getTimeStamp(id);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
+			inventoryItem.setTimestamp(t);
+			
 			inventoryItem.setItemID(id);
 			inventory.add(inventoryItem);
 	
@@ -70,8 +81,10 @@ public class InventoryModel {
 
 	}
 	
-	public void editItem(int itemID, String partNumber, int locationIndex, int quantity) {
+	//needs to throw exception to be caught by controller, and passed on to view, to let them know when item timestamp mismatch (redo)
+	public void editItem(int itemID, String partNumber, int locationIndex, int quantity, Timestamp itemTime) throws DatabaseLockException {
 		
+		Timestamp t = null;
 		
 		if(this.isUniqueItem(partNumber, locationIndex)) {
 			PartModel part = getPartByNumber(partNumber);
@@ -81,11 +94,20 @@ public class InventoryModel {
 			editItem.setItemQuantity(quantity);
 			
 			try {
-				itemGateway.editItem(itemID, partNumber, InventoryItemModel.LOCATIONS[locationIndex], quantity);
+				itemGateway.editItem(itemID, partNumber, InventoryItemModel.LOCATIONS[locationIndex], quantity, itemTime);
 			} catch (SQLException e) {
 				e.printStackTrace();
+			} catch (DatabaseLockException e){
+				throw new DatabaseLockException("Item out of Sync. Retry Edit");
 			}
-			
+			  
+			try {
+				t = this.itemGateway.getTimeStamp(itemID);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			editItem.setTimestamp(t);
 			
 		} else {
 			throw new IllegalArgumentException("ITEM in same LOCATION already exists in inventory.");
