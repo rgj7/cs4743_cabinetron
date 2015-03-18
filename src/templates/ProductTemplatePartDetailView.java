@@ -1,12 +1,14 @@
 package templates;
 
+import java.awt.Component;
 import java.text.NumberFormat;
 
+import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import javax.swing.JTextField;
 import javax.swing.text.NumberFormatter;
 
@@ -19,7 +21,7 @@ public class ProductTemplatePartDetailView extends JFrame {
 	private JTextField partIDTextField, prodTempIDTextField;
 	private JFormattedTextField quantityTextField;
 	
-	public ProductTemplatePartDetailView(int prodTempPartIndex) {
+	public ProductTemplatePartDetailView(ProductTemplateModel model, int prodTempPartIndex) {
 		super("Product Template Details");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
@@ -57,14 +59,12 @@ public class ProductTemplatePartDetailView extends JFrame {
 		formPanel.add(itemQuantityLabel, "");
 		formPanel.add(quantityTextField, "");
 		
-		// get values for fields
-		/*
-		if(prodTempPartIndex != model.getLastProductTemplateID()) { // don't get values if new item
+		if(prodTempPartIndex >= 0) { // don't get values if new item
 			// get inventory item
-			ProductTemplateModel prodTempModel = model.getProdTempByIndex(prodTempIndex);
-			prodTempIDTextField.setText();
-			partIDTextField.setText();
-			quantityTextField.setText();
+			ProductTemplatePartModel prodTempPartModel = model.getProdTempPartByIndex(prodTempPartIndex);
+			prodTempIDTextField.setText(String.valueOf(prodTempPartModel.getProductTemplateID()));
+			partIDTextField.setText(String.valueOf(prodTempPartModel.getPartID()));
+			quantityTextField.setText(String.valueOf(prodTempPartModel.getPartQuantity()));
 			
 			// initialize and add "edit/delete" buttons
 			JButton editProdTempButton = new JButton("Edit");
@@ -73,17 +73,45 @@ public class ProductTemplatePartDetailView extends JFrame {
 			formPanel.add(deleteProdTempButton, "");
 		} else {
 			// sets item id to next available id
-			prodTempIdTextField.setText(String.valueOf(model.getLastProductTemplateID()));
+			prodTempIDTextField.setText(String.valueOf(model.getProductTemplateID()));
 			
 			// initialize and add "add" button
 			JButton addProdTempButton = new JButton("Add");
 			formPanel.add(addProdTempButton, "skip");
 		}
-		*/
 		
 		add(formPanel);
 		pack(); // sizes window to fit components
 		setLocationRelativeTo(null); // centers window
 		setVisible(true);
+	}
+	
+	public void registerListeners(ProductTemplatePartController controller1) {
+		Component[] components = formPanel.getComponents();
+		for(Component component : components) {
+			if(component instanceof AbstractButton) {
+				AbstractButton button = (AbstractButton) component;
+				button.addActionListener(controller1);
+			}
+		}
+	}
+	
+	public void close() {
+		this.dispose();
+	}
+	
+	/////////////
+	// GETTERS
+	
+	public int getProductTemplateID() {
+		return Integer.parseInt(prodTempIDTextField.getText());
+	}
+	
+	public int getProductTemplatePartID() {
+		return Integer.parseInt(partIDTextField.getText());
+	}
+	
+	public int getItemQuantity() {
+		return Integer.parseInt(quantityTextField.getText());
 	}
 }

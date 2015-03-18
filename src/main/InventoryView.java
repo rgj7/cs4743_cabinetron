@@ -20,6 +20,7 @@ import javax.swing.JTable;
 import parts.PartTableController;
 import parts.PartView;
 import templates.ProductTemplateModel;
+import templates.ProductTemplatePartController;
 import templates.ProductTemplatePartTableController;
 import templates.ProductTemplatePartTableModel;
 import templates.ProductTemplateTableController;
@@ -31,6 +32,7 @@ public class InventoryView extends JFrame {
 	private InventoryModel model;
 	private JMenu inventoryMenu, partsMenu, prodTempMenu;
 	private JTabbedPane tabbedPane;
+	private JTable currentTable;
 	
 	private InventoryItemView inventoryItemView;
 	private PartView partView;
@@ -108,6 +110,7 @@ public class InventoryView extends JFrame {
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
 		JTable table = new JTable(new ProductTemplatePartTableModel(model, prodTempModel));
+		setCurrentTable(table);
 		//JTable table = new JTable(new PartsTableModel(model));
 		JScrollPane scrollPane = new JScrollPane(table);
 		
@@ -123,7 +126,17 @@ public class InventoryView extends JFrame {
 		tabbedPane.add("ProductTemplate: " + prodTempModel.getProductTemplateNumber(), mainPanel);
 		tabbedPane.setSelectedComponent(mainPanel);
 		
-		table.addMouseListener(new ProductTemplatePartTableController(model, this));
+		// add mouse listener to table
+		table.addMouseListener(new ProductTemplatePartTableController(model, this, prodTempModel));
+		// add action listeners to buttons
+		ProductTemplatePartController controller1 = new ProductTemplatePartController(model, this, prodTempModel, null);
+		Component[] components = buttonPanel.getComponents();
+		for(Component component : components) {
+			if(component instanceof AbstractButton) {
+				AbstractButton button = (AbstractButton) component;
+				button.addActionListener(controller1);
+			}
+		}
 	}
 	
 	
@@ -163,6 +176,18 @@ public class InventoryView extends JFrame {
 	
 	public int getSelectedProdTempRow() {
 		return prodTempView.getSelectedTableRow();
+	}
+	
+	public JTabbedPane getTabbedPane() {
+		return tabbedPane;
+	}
+	
+	public JTable getCurrentTable() {
+		return currentTable;
+	}
+	
+	public void setCurrentTable(JTable table) {
+		currentTable = table;
 	}
 	
 	// show small pop-up message

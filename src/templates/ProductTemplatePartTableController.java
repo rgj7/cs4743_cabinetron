@@ -1,8 +1,5 @@
 package templates;
 
-import items.InventoryItemController;
-import items.InventoryItemDetailView;
-
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -12,20 +9,22 @@ import main.InventoryView;
 public class ProductTemplatePartTableController implements MouseListener {
 	private InventoryModel model;
 	private InventoryView view;
+	private ProductTemplateModel prodTempModel;
 	
 	////////////////
 	// CONSTRUCTOR
 	
-	public ProductTemplatePartTableController(InventoryModel model, InventoryView view) {
+	public ProductTemplatePartTableController(InventoryModel model, InventoryView view, ProductTemplateModel prodTempModel) {
 		this.model = model;
 		this.view = view;
+		this.prodTempModel = prodTempModel;
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 2) {
-			ProductTemplatePartDetailView prodTempPartView = new ProductTemplatePartDetailView(1);
-			//prodTempPartView.registerListeners(new ProductTemplatePartController(model, view, prodTempPartView));
+			ProductTemplatePartDetailView prodTempPartView = new ProductTemplatePartDetailView(prodTempModel, view.getCurrentTable().getSelectedRow());
+			prodTempPartView.registerListeners(new ProductTemplatePartController(model, view, prodTempModel, prodTempPartView));
 		}
 	}
 

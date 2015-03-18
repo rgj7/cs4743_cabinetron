@@ -32,8 +32,6 @@ public class InventoryModel {
 		//loads parts from database
 		try {
 			this.parts = partGateway.loadParts();
-			// DEBUG
-			parts.toString();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -57,17 +55,14 @@ public class InventoryModel {
 		this.lastProdTempID = 4; // 3+1
 		
 		// get last id
-		this.lastItemID = itemGateway.getLastID() + 1; // TODO: get last item id from database
+		this.lastItemID = itemGateway.getLastID() + 1;
 		this.lastPartID = partGateway.getLastID() + 1;
-		
-		// DEBUG LOOP
-		for(InventoryItemModel item : inventory) {
-			System.out.format("{%1$d, %2$s, '%3$s', %4$d}\n", item.getItemID(), item.getItemPart().toString(), item.getItemLocation(), item.getItemQuantity());
-		}
 	}
 	
 	///////////
 	// METHODS
+	
+	// ITEMS
 	
 	public void addItem(String partNumber, int locationIndex, int quantity) {
 		int id = -1;
@@ -117,6 +112,8 @@ public class InventoryModel {
 		InventoryItemModel delItem = getItemByID(itemID);
 		inventory.remove(delItem);
 	}
+	
+	// PARTS
 	
 	public void addPart(String number, String name, int unitIndex, String externalNumber, String vendor) {
 		int id = -1;
@@ -176,6 +173,8 @@ public class InventoryModel {
 		
 	}
 	
+	// PRODUCT TEMPLATES
+	
 	public void addProductTemplate(String name, String desc) {
 		int id = -1;
 		
@@ -192,6 +191,8 @@ public class InventoryModel {
 	public void deleteProductTemplate(int prodTempId) {
 		
 	}
+	
+	// UTILITY METHODS
 	
 	private boolean isUniqueItem(String partNumber, int locationIndex) { // checks for same part/location
 		for(InventoryItemModel item : inventory) {

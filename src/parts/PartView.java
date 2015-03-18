@@ -29,7 +29,7 @@ public class PartView extends JPanel {
 		
 		// set column widths
 		TableColumn column = null;
-		for (int i = 0; i < InventoryModel.ITEMFIELDS.length; i++) {
+		for (int i = 0; i < InventoryModel.PARTFIELDS.length; i++) {
 		    column = partsTable.getColumnModel().getColumn(i);
 		    if(InventoryModel.PARTFIELDS[i].equals("PARTID")) {
 		        column.setPreferredWidth(25);
