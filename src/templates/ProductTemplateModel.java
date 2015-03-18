@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class ProductTemplateModel {
 
-	public static final String[] PARTFIELDS = {"PTID", "PART ID", "QUANTITY"};
+	public static final String[] PARTFIELDS = {"PTID", "PART ID", "PART NAME", "QUANTITY"};
 	
 	// TODO: create supplemental fields if needed (date_added, last_modified, etc.)
 	private int prodTempID;

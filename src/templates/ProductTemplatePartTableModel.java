@@ -2,13 +2,17 @@ package templates;
 
 import javax.swing.table.AbstractTableModel;
 
+import main.InventoryModel;
+
 @SuppressWarnings("serial")
 public class ProductTemplatePartTableModel extends AbstractTableModel {
 
 	private ProductTemplateModel model;
+	private InventoryModel inventoryModel;
 	
-	public ProductTemplatePartTableModel(ProductTemplateModel model){
+	public ProductTemplatePartTableModel(InventoryModel inventoryModel, ProductTemplateModel model){
 		this.model = model;
+		this.inventoryModel = inventoryModel;
 	}
 	
 	@Override
@@ -33,6 +37,8 @@ public class ProductTemplatePartTableModel extends AbstractTableModel {
 				return this.model.getProdTempPartByIndex(row).getProductTemplateID();
 			case "PART ID":
 				return this.model.getProdTempPartByIndex(row).getPartID();
+			case "PART NAME":
+				return this.inventoryModel.getPartByID(this.model.getProdTempPartByIndex(row).getPartID()).getPartName();
 			case "QUANTITY":
 				return this.model.getProdTempPartByIndex(row).getPartQuantity();
 			default:

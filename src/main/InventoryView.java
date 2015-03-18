@@ -107,7 +107,7 @@ public class InventoryView extends JFrame {
 		ProductTemplateModel prodTempModel = model.getProdTempByIndex(prodTempIndex);
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
-		JTable table = new JTable(new ProductTemplatePartTableModel(prodTempModel));
+		JTable table = new JTable(new ProductTemplatePartTableModel(model, prodTempModel));
 		//JTable table = new JTable(new PartsTableModel(model));
 		JScrollPane scrollPane = new JScrollPane(table);
 		
