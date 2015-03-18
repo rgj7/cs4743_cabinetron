@@ -23,7 +23,7 @@ public class PartView extends JPanel {
 		this.setLayout(new BorderLayout());
 		
 		// initialize main parts table
-		partsTable = new JTable(new PartsTableModel(model));
+		partsTable = new JTable(new PartTableModel(model));
 		JScrollPane partsScrollPane = new JScrollPane(partsTable); // for scrolling
 		//partsTable.setFillsViewportHeight(true);
 		

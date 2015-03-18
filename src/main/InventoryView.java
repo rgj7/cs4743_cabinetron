@@ -157,6 +157,13 @@ public class InventoryView extends JFrame {
 			}
 		}
 		
+		components = prodTempMenu.getMenuComponents();
+		for(Component component : components) {
+			if(component instanceof AbstractButton) {
+				AbstractButton button = (AbstractButton) component;
+				button.addActionListener(controller1);
+			}
+		}
 		// register listeners
 		// TODO: move from InventoryController to respective XController
 		inventoryItemView.registerListeners(controller1, controller2);
