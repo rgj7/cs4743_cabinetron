@@ -1,11 +1,13 @@
-package cabinetron3;
+package main;
 
 import javax.swing.JFrame;
-import com.mysql.jdbc.Connection;
+
+import database.GatewayException;
+import database.ItemTableGateway;
+import database.PartTableGateway;
 
 public class Inventory {
 	public static void main(String[] args) {
-		
 		
 		PartTableGateway ptg = null;
 		try {
@@ -26,7 +28,7 @@ public class Inventory {
 		// model
 		InventoryModel model = new InventoryModel(ptg, itg);
 		// view
-		InventoryListView view = new InventoryListView(model);
+		InventoryView view = new InventoryView(model);
 		// controllers
 		InventoryController menuController = new InventoryController(model, view);
 		InventoryTableController tableController = new InventoryTableController(model, view);

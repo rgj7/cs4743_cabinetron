@@ -1,4 +1,4 @@
-package cabinetron3;
+package templates;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import main.InventoryView;
+import main.InventoryModel;
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
@@ -21,7 +23,7 @@ public class ProductTemplateDetailView extends JFrame {
 	private JTextField prodTempIdTextField, prodTempNumberTextField;
 	private JTextArea prodTempDescriptionTextArea;
 	
-	public ProductTemplateDetailView(InventoryModel model, InventoryListView view, int prodTempIndex) {
+	public ProductTemplateDetailView(InventoryModel model, InventoryView view, int prodTempIndex) {
 		super("Product Template Details");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		

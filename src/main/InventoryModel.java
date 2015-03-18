@@ -1,7 +1,14 @@
-package cabinetron3;
+package main;
+
+import items.InventoryItemModel;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import database.ItemTableGateway;
+import database.PartTableGateway;
+import parts.PartModel;
+import templates.ProductTemplateModel;
 
 public class InventoryModel {
 	public static final String[] ITEMFIELDS = {"ITEMID", "PART NUMBER", "PART NAME", "LOCATION", "QUANTITY"};
@@ -14,6 +21,7 @@ public class InventoryModel {
 	private ArrayList<PartModel> parts;
 	private ArrayList<ProductTemplateModel> productTemplates;
 	private int lastItemID, lastPartID, lastProdTempID;
+	
 	// DEBUG
 	private ProductTemplateModel ptTest1, ptTest2, ptTest3;
 	
@@ -24,6 +32,7 @@ public class InventoryModel {
 		//loads parts from database
 		try {
 			this.parts = partGateway.loadParts();
+			// DEBUG
 			parts.toString();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -37,7 +46,7 @@ public class InventoryModel {
 			e.printStackTrace();
 		}
 		
-		// load static product templates
+		// DEBUG
 		productTemplates = new ArrayList<ProductTemplateModel>();
 		ptTest1 = new ProductTemplateModel(1, "A1234", "Cabinet drawer");
 		ptTest2 = new ProductTemplateModel(2, "A647X", "Basic Oak Cabinet");

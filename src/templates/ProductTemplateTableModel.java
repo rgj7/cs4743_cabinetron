@@ -1,6 +1,8 @@
-package cabinetron3;
+package templates;
 
 import javax.swing.table.AbstractTableModel;
+
+import main.InventoryModel;
 
 @SuppressWarnings("serial")
 public class ProductTemplateTableModel extends AbstractTableModel {

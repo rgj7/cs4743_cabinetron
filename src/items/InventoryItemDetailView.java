@@ -1,4 +1,4 @@
-package cabinetron3;
+package items;
 
 import java.awt.Component;
 import java.text.NumberFormat;
@@ -6,6 +6,8 @@ import java.text.NumberFormat;
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 
+import main.InventoryView;
+import main.InventoryModel;
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
@@ -19,7 +21,7 @@ public class InventoryItemDetailView extends JFrame {
 	////////////////
 	// CONSTRUCTOR
 	
-	public InventoryItemDetailView(InventoryModel model, InventoryListView view, int itemIndex) {
+	public InventoryItemDetailView(InventoryModel model, InventoryView view, int itemIndex) {
 		super("Item Details");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		

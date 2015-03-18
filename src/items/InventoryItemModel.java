@@ -1,4 +1,6 @@
-package cabinetron3;
+package items;
+
+import parts.PartModel;
 
 public class InventoryItemModel {
 	public static final String[] LOCATIONS = {"Unknown", "Facility 1 Warehouse 1", "Facility 1 Warehouse 2", "Facility 2"};

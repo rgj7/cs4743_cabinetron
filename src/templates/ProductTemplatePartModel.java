@@ -1,4 +1,4 @@
-package cabinetron3;
+package templates;
 
 public class ProductTemplatePartModel {
 

@@ -1,18 +1,21 @@
-package cabinetron3;
+package items;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import main.InventoryView;
+import main.InventoryModel;
+
 public class InventoryItemController implements ActionListener {
 
 	private InventoryModel model;
-	private InventoryListView view;
+	private InventoryView view;
 	private InventoryItemDetailView itemView;
 	
 	////////////////
 	// CONSTRUCTOR
 	
-	public InventoryItemController(InventoryModel model, InventoryListView view, InventoryItemDetailView itemView) {
+	public InventoryItemController(InventoryModel model, InventoryView view, InventoryItemDetailView itemView) {
 		this.model = model;
 		this.view = view;
 		this.itemView = itemView;

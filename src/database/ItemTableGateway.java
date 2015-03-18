@@ -1,4 +1,6 @@
-package cabinetron3;
+package database;
+import items.InventoryItemModel;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -11,6 +13,8 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import javax.sql.DataSource;
+
+import parts.PartModel;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
