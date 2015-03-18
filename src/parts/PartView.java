@@ -12,7 +12,6 @@ import javax.swing.table.TableColumn;
 
 import main.InventoryController;
 import main.InventoryModel;
-import main.InventoryTableController;
 
 @SuppressWarnings("serial")
 public class PartView extends JPanel {

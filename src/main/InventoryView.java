@@ -17,10 +17,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
-import parts.PartController;
 import parts.PartTableController;
 import parts.PartView;
 import templates.ProductTemplateModel;
+import templates.ProductTemplatePartTableController;
 import templates.ProductTemplatePartTableModel;
 import templates.ProductTemplateTableController;
 import templates.ProductTemplateView;
@@ -112,11 +112,9 @@ public class InventoryView extends JFrame {
 		JScrollPane scrollPane = new JScrollPane(table);
 		
 		JButton addPartToProdTemp = new JButton("Add Part to Product Template");
-		JButton editProdTemp = new JButton("Edit Product Template");
-		JButton closeProdTemp = new JButton("Save/Close Product Template");
+		JButton closeProdTemp = new JButton("Close Product Template");
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(addPartToProdTemp);
-		buttonPanel.add(editProdTemp);
 		buttonPanel.add(closeProdTemp);
 		
 		mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -124,7 +122,10 @@ public class InventoryView extends JFrame {
 		
 		tabbedPane.add(prodTempModel.getProductTemplateNumber(), mainPanel);
 		tabbedPane.setSelectedComponent(mainPanel);
+		
+		table.addMouseListener(new ProductTemplatePartTableController(model, this));
 	}
+	
 	
 	public void registerListeners(InventoryController controller1, InventoryTableController controller2) {	
 		Component[] components = inventoryMenu.getMenuComponents();
@@ -144,6 +145,7 @@ public class InventoryView extends JFrame {
 		}
 		
 		// register listeners
+		// TODO: move from InventoryController to respective XController
 		inventoryItemView.registerListeners(controller1, controller2);
 		partView.registerListeners(controller1, new PartTableController(model, this));
 		prodTempView.registerListeners(controller1, new ProductTemplateTableController(model, this));
@@ -170,6 +172,12 @@ public class InventoryView extends JFrame {
 	
 	public int showWarningMsg(String msg) {
 		return JOptionPane.showConfirmDialog(null, msg, "Warning", JOptionPane.YES_NO_OPTION);
+	}
+	
+	public int prodTempOptionDialog() {
+		String[] options = {"Edit PT", "View PT Parts"};
+		return JOptionPane.showOptionDialog(this, "Would you like to edit the Product Template or view its parts?", 
+				"Product Template Options", 0, JOptionPane.QUESTION_MESSAGE, null, options, "Edit");
 	}
 		
 	public void update() {

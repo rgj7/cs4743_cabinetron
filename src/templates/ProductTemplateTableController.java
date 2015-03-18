@@ -22,9 +22,17 @@ public class ProductTemplateTableController implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 2) {
-			view.addProductTemplateTab(view.getSelectedProdTempRow());
-			//ProductTemplateDetailView prodTempView = new ProductTemplateDetailView(model, view, view.getSelectedProdTempRow());
-			//prodTempView.registerListeners(new ProductTemplateController(model, view, prodTempView));
+			switch(view.prodTempOptionDialog()) {
+				case 0: // edit
+					ProductTemplateDetailView prodTempView = new ProductTemplateDetailView(model, view, view.getSelectedProdTempRow());
+					prodTempView.registerListeners(new ProductTemplateController(model, view, prodTempView));
+					break;
+				case 1: // view
+					view.addProductTemplateTab(view.getSelectedProdTempRow());
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
