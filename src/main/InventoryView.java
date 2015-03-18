@@ -16,8 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import parts.PartTableController;
 import parts.PartView;
@@ -146,8 +144,8 @@ public class InventoryView extends JFrame {
 		}
 	}
 	
-	
 	public void registerListeners(InventoryController controller1, InventoryTableController controller2) {	
+		// register action listeners for menu items
 		Component[] components = inventoryMenu.getMenuComponents();
 		for(Component component : components) {
 			if(component instanceof AbstractButton) {
@@ -155,7 +153,6 @@ public class InventoryView extends JFrame {
 				button.addActionListener(controller1);
 			}
 		}
-		
 		components = partsMenu.getMenuComponents();
 		for(Component component : components) {
 			if(component instanceof AbstractButton) {
@@ -163,7 +160,6 @@ public class InventoryView extends JFrame {
 				button.addActionListener(controller1);
 			}
 		}
-		
 		components = prodTempMenu.getMenuComponents();
 		for(Component component : components) {
 			if(component instanceof AbstractButton) {
@@ -212,13 +208,7 @@ public class InventoryView extends JFrame {
 	public int showWarningMsg(String msg) {
 		return JOptionPane.showConfirmDialog(null, msg, "Warning", JOptionPane.YES_NO_OPTION);
 	}
-	
-	public int prodTempOptionDialog() {
-		String[] options = {"Edit PT", "View PT Parts"};
-		return JOptionPane.showOptionDialog(this, "Would you like to edit the Product Template or view its parts?", 
-				"Product Template Options", 0, JOptionPane.QUESTION_MESSAGE, null, options, "Edit");
-	}
-		
+			
 	public void update() {
 		partView.update();
 		inventoryItemView.update();
