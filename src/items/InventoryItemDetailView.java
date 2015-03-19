@@ -55,6 +55,7 @@ public class InventoryItemDetailView extends JFrame {
 		NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
 		numberFormatter.setValueClass(Integer.class);
 		numberFormatter.setAllowsInvalid(false);
+
 		// Field: QUANTITY
 		itemQuantityTextField = new JFormattedTextField(numberFormatter);
 		itemQuantityTextField.setText("1"); // since initial must be 1 or greater anyway

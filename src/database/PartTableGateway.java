@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 import parts.PartModel;
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 public class PartTableGateway {
@@ -163,7 +164,7 @@ public class PartTableGateway {
 		
 	}
 	
-	public void deletePart(int id) throws SQLException{
+	public void deletePart(int id) throws SQLException, MySQLIntegrityConstraintViolationException {
 		sRS = null;
 		sRS = conn.prepareStatement("DELETE FROM part WHERE id = ?");
 		sRS.setInt(1, id);
