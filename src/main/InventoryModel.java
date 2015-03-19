@@ -103,34 +103,33 @@ public class InventoryModel {
 	
 	//needs to throw exception to be caught by controller, and passed on to view, to let them know when item timestamp mismatch (redo)
 	public void editItem(int itemID, String partNumber, int locationIndex, int quantity, Timestamp itemTime) throws DatabaseLockException {
-		
 		Timestamp t = null;
-		
-		if(this.isUniqueItem(partNumber, locationIndex)) {
-			PartModel part = getPartByNumber(partNumber);
-			InventoryItemModel editItem = getItemByID(itemID);
-			editItem.setItemPart(part);
-			editItem.setItemLocationIndex(locationIndex);
-			editItem.setItemQuantity(quantity);
-			try {
-				itemGateway.editItem(itemID, partNumber, InventoryItemModel.LOCATIONS[locationIndex], quantity, itemTime);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} catch (DatabaseLockException e){
-				throw new DatabaseLockException("Item out of Sync. Retry Edit");
-			}
-			  
-			try {
-				t = this.itemGateway.getTimeStamp(itemID);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			editItem.setTimestamp(t);
-			
-		} else {
+		InventoryItemModel editItem = getItemByID(itemID);
+		if(!editItem.getItemPart().getPartNumber().equals(partNumber) || editItem.getItemLocationIndex() != locationIndex) {	
+			if(this.isUniqueItem(partNumber, locationIndex)) {
+				PartModel part = getPartByNumber(partNumber);
+				editItem.setItemPart(part);
+				editItem.setItemLocationIndex(locationIndex);
+			} else {
 			throw new IllegalArgumentException("ITEM in same LOCATION already exists in inventory.");
-		}			
+			}	
+		}
+		editItem.setItemQuantity(quantity);
+		try {
+			itemGateway.editItem(itemID, partNumber, InventoryItemModel.LOCATIONS[locationIndex], quantity, itemTime);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (DatabaseLockException e){
+			throw new DatabaseLockException("Item out of Sync. Retry Edit");
+		}
+		  
+		try {
+			t = this.itemGateway.getTimeStamp(itemID);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		editItem.setTimestamp(t);	
 	}
 	
 	public void deleteItem(int itemID) {
@@ -164,20 +163,22 @@ public class InventoryModel {
 	}
 	
 	public void editPart(int id, String number, String name, int unitIndex, String externalNumber, String vendor) {
-		if(this.isUniquePart(number)) {
-			PartModel editPart = getPartByID(id);
-			editPart.setPartNumber(number);
-			editPart.setPartName(name);
-			editPart.setPartUnitIndex(unitIndex);
-			editPart.setExternalPartNumber(externalNumber);
-			editPart.setPartVendor(vendor);
-			try {
-				partGateway.editPart(id,  number,  name, PartModel.UNITS[unitIndex], externalNumber, vendor);
-			} catch (SQLException e) {
-				e.printStackTrace();
+		PartModel editPart = getPartByID(id);
+		if(!editPart.getPartNumber().equals(number)) {
+			if(isUniquePart(number)) {
+				editPart.setPartNumber(number);
+			} else {
+				throw new IllegalArgumentException("PART NUMBER already exists in part list.");
 			}
-		} else {
-			throw new IllegalArgumentException("PART NUMBER already exists in part list.");
+		}
+		editPart.setPartName(name);
+		editPart.setPartUnitIndex(unitIndex);
+		editPart.setExternalPartNumber(externalNumber);
+		editPart.setPartVendor(vendor);
+		try {
+			partGateway.editPart(id, number, name, PartModel.UNITS[unitIndex], externalNumber, vendor);
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 	
