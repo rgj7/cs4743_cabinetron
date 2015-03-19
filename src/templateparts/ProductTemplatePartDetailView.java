@@ -1,6 +1,10 @@
 package templateparts;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.NumberFormat;
 
 import javax.swing.AbstractButton;
@@ -20,16 +24,17 @@ import net.miginfocom.swing.MigLayout;
 @SuppressWarnings("serial")
 public class ProductTemplatePartDetailView extends JFrame {
 	
+	private InventoryModel inventoryModel;
 	private JPanel formPanel;
 	private JTextField partIDTextField, prodTempIDTextField;
-	// TEST
 	private JComboBox<String> itemPartComboBox;
-	// ENDTEST
 	private JFormattedTextField quantityTextField;
 	
 	public ProductTemplatePartDetailView(InventoryModel inventoryModel, ProductTemplateModel model, int prodTempPartIndex) {
 		super("Product Template Details");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
+		this.inventoryModel = inventoryModel;
 		
 		MigLayout layout = new MigLayout("wrap 2", "[right]10[grow,fill]", "[]10[]");
 		formPanel = new JPanel(layout);
@@ -42,16 +47,15 @@ public class ProductTemplatePartDetailView extends JFrame {
 		
 		// Field: PART ID
 		partIDTextField = new JTextField();
+		partIDTextField.setEditable(false);
 		JLabel partIdLabel = new JLabel("Part ID");
 		partIdLabel.setLabelFor(partIDTextField);
 		
-		// TEST
 		// Field: PART NAME
 		itemPartComboBox = new JComboBox<String>(inventoryModel.getPartNames()); 
 		JLabel itemPartLabel = new JLabel("Part Name");
 		itemPartLabel.setLabelFor(itemPartComboBox);
-		// ENDTEST
-		
+
 		// initialize number formatter for quantity field
 		NumberFormat numberFormat = NumberFormat.getIntegerInstance();
 		numberFormat.setGroupingUsed(false);
@@ -69,10 +73,8 @@ public class ProductTemplatePartDetailView extends JFrame {
 		formPanel.add(prodTempIDTextField, "");
 		formPanel.add(partIdLabel, "");
 		formPanel.add(partIDTextField, "");
-		// TEST
 		formPanel.add(itemPartLabel, "");
 		formPanel.add(itemPartComboBox, "");
-		// ENDTEST
 		formPanel.add(itemQuantityLabel, "");
 		formPanel.add(quantityTextField, "");
 		
@@ -81,9 +83,7 @@ public class ProductTemplatePartDetailView extends JFrame {
 			ProductTemplatePartModel prodTempPartModel = model.getProdTempPartByIndex(prodTempPartIndex);
 			prodTempIDTextField.setText(String.valueOf(prodTempPartModel.getProductTemplateID()));
 			partIDTextField.setText(String.valueOf(prodTempPartModel.getPartID()));
-			// TEST
 			itemPartComboBox.setSelectedItem(inventoryModel.getPartByID(prodTempPartModel.getPartID()).getPartName());
-			// ENDTEST
 			quantityTextField.setText(String.valueOf(prodTempPartModel.getPartQuantity()));
 			
 			// initialize and add "edit/delete" buttons
@@ -114,6 +114,15 @@ public class ProductTemplatePartDetailView extends JFrame {
 				button.addActionListener(controller1);
 			}
 		}
+		
+		itemPartComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				if(arg0.getStateChange() == ItemEvent.SELECTED) {
+					partIDTextField.setText(String.valueOf(inventoryModel.getPartByName(itemPartComboBox.getSelectedItem().toString()).getPartID()));
+				}
+			}
+		});
 	}
 	
 	public void close() {
