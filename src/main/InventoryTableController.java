@@ -1,16 +1,19 @@
-package cabinetron3;
+package main;
+
+import items.InventoryItemController;
+import items.InventoryItemDetailView;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class InventoryTableController implements MouseListener {
 	private InventoryModel model;
-	private InventoryListView view;
+	private InventoryView view;
 	
 	////////////////
 	// CONSTRUCTOR
 	
-	public InventoryTableController(InventoryModel model, InventoryListView view) {
+	public InventoryTableController(InventoryModel model, InventoryView view) {
 		this.model = model;
 		this.view = view;
 	}
@@ -18,13 +21,8 @@ public class InventoryTableController implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 2) {
-			if(view.getCurrentView() == 1) {
-				InventoryItemDetailView itemView = new InventoryItemDetailView(model, view, view.getSelectedItemRow());
-				itemView.registerListeners(new InventoryItemController(model, view, itemView));
-			} else if(view.getCurrentView() == 2) {
-				PartDetailView partView = new PartDetailView(model, view, view.getSelectedPartRow());
-				partView.registerListeners(new PartController(model, view, partView));
-			}
+			InventoryItemDetailView itemView = new InventoryItemDetailView(model, view, view.getSelectedInventoryItemRow());
+			itemView.registerListeners(new InventoryItemController(model, view, itemView));
 		}
 	}
 

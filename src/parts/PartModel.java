@@ -1,4 +1,4 @@
-package cabinetron3;
+package parts;
 
 public class PartModel {
 	public static final String[] UNITS = {"Unknown", "Linear Feet", "Pieces"};

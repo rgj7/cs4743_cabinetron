@@ -1,12 +1,13 @@
 package tests;
 
 import static org.junit.Assert.*;
-import cabinetron3.PartModel;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import parts.PartModel;
 
 /*
  * CS4743 Assignment 2, Spring 2015

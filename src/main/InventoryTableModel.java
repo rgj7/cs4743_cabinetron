@@ -1,4 +1,4 @@
-package cabinetron3;
+package main;
 
 import javax.swing.table.AbstractTableModel;
 

@@ -1,4 +1,6 @@
-package cabinetron3;
+package database;
+import items.InventoryItemModel;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -6,13 +8,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import parts.PartModel;
+
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+
+import database.DatabaseLockException;
 
 public class ItemTableGateway {
 	
@@ -80,7 +87,8 @@ public class ItemTableGateway {
         	int quant = rs.getInt("quantity");
         	int partId = rs.getInt("part_id");
         	p = partGateway.getPart(partId);
-        	i = new InventoryItemModel(id, p, Arrays.asList(InventoryItemModel.LOCATIONS).indexOf(location), quant);
+        	Timestamp time = rs.getTimestamp("time");
+        	i = new InventoryItemModel(id, p, Arrays.asList(InventoryItemModel.LOCATIONS).indexOf(location), quant, time);
         	items.add(i);
 		    moreItems = rs.next();
 		    this.lastID = id;
@@ -91,6 +99,18 @@ public class ItemTableGateway {
 	
 	public int getLastID(){
 		return this.lastID;
+	}
+	
+	public Timestamp getTimeStamp(int id) throws SQLException{
+		sRS = null;
+		rs = null;
+	    sRS = conn.prepareStatement("SELECT * from item " +
+		                            "WHERE id = ?");
+	    sRS.setInt(1, id);
+	    rs = sRS.executeQuery();
+	    rs.first();
+	    Timestamp t = rs.getTimestamp("time");
+	    return t;
 	}
 	
 	public int addItem(String part_num, String location, int quantity) throws SQLException{
@@ -111,17 +131,27 @@ public class ItemTableGateway {
 		return id;
 	}
 	
-	public void editItem(int id, String part_num, String location, int quantity) throws SQLException{
+	public void editItem(int id, String part_num, String location, int quantity,
+			             Timestamp timestmp) throws SQLException, DatabaseLockException{
+		int count = 0;
 		sRS = null;
+		
+		System.out.println(timestmp.toString()); //TESTING
+		System.out.println(this.getTimeStamp(id).toString()); //TESTING
 		int part_id = partGateway.getPartId(part_num);
 		sRS = conn.prepareStatement("UPDATE item " +
 		                            "SET location = ?, quantity = ?, part_id = ?" + 
-				                    " WHERE id = ?");
+				                    " WHERE id = ? AND time = ?");
 		sRS.setString(1, location);
 		sRS.setInt(2, quantity);
 		sRS.setInt(3, part_id);
 		sRS.setInt(4, id);
-		sRS.execute();
+		sRS.setTimestamp(5, timestmp);
+		count = sRS.executeUpdate();
+		
+		if ( count < 1){
+			throw new DatabaseLockException("Item out of Sync. Retry Item Edit");
+		}
 		
 	}
 	

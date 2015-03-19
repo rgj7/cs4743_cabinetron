@@ -1,4 +1,4 @@
-package cabinetron3;
+package parts;
 
 import java.awt.Component;
 
@@ -10,6 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import main.InventoryView;
+import main.InventoryModel;
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
@@ -22,7 +24,7 @@ public class PartDetailView extends JFrame {
 	////////////////
 	// CONSTRUCTOR
 	
-	public PartDetailView(InventoryModel model, InventoryListView view, int partIndex) {
+	public PartDetailView(InventoryModel model, InventoryView view, int partIndex) {
 		super("Part Details");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		

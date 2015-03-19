@@ -1,11 +1,14 @@
-package cabinetron3;
+package main;
 
 import javax.swing.JFrame;
-import com.mysql.jdbc.Connection;
+import javax.swing.Timer;
+
+import database.GatewayException;
+import database.ItemTableGateway;
+import database.PartTableGateway;
 
 public class Inventory {
 	public static void main(String[] args) {
-		
 		
 		PartTableGateway ptg = null;
 		try {
@@ -26,10 +29,11 @@ public class Inventory {
 		// model
 		InventoryModel model = new InventoryModel(ptg, itg);
 		// view
-		InventoryListView view = new InventoryListView(model);
+		InventoryView view = new InventoryView(model);
 		// controllers
 		InventoryController menuController = new InventoryController(model, view);
 		InventoryTableController tableController = new InventoryTableController(model, view);
+		ReloadController reloadController = new ReloadController(model, view);
 
 		// register controllers
 		view.registerListeners(menuController, tableController);
@@ -39,5 +43,9 @@ public class Inventory {
 		view.setSize(800, 480);
 		view.setLocationRelativeTo(null);
 		view.setVisible(true);
+         
+		Timer timer = new Timer(2000, reloadController);
+		timer.start();
+				
 	}
 }

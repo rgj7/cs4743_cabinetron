@@ -1,13 +1,15 @@
-package cabinetron3;
+package parts;
 
 import javax.swing.table.AbstractTableModel;
 
+import main.InventoryModel;
+
 @SuppressWarnings("serial")
-public class PartsTableModel extends AbstractTableModel {
+public class PartTableModel extends AbstractTableModel {
 	
 	private InventoryModel model;
 	
-	public PartsTableModel(InventoryModel model) {
+	public PartTableModel(InventoryModel model) {
 		this.model = model;
 	}
 	

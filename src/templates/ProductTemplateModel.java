@@ -1,18 +1,29 @@
-package cabinetron3;
+package templates;
+
+import java.util.ArrayList;
+
+import templateparts.ProductTemplatePartModel;
 
 public class ProductTemplateModel {
 
-	// TODO: create supplemental fields if needed (date_added, last_modified, etc.)
+	public static final String[] PARTFIELDS = {"PTID", "PART ID", "PART NAME", "QUANTITY"};
 	
+	// TODO: create supplemental fields if needed (date_added, last_modified, etc.)
 	private int prodTempID;
 	private String prodTempNumber, prodTempDesc;
+	private ArrayList<ProductTemplatePartModel> prodTempParts;
 	
 	public ProductTemplateModel(int id, String number, String desc) {
-		this.setProductTemplateID(id);
-		this.setProductTemplateNumber(number);
-		this.setProductTemplateDescription(desc);
+		setProductTemplateID(id);
+		setProductTemplateNumber(number);
+		setProductTemplateDescription(desc);
+		
+		// DEBUG
+		this.prodTempParts = new ArrayList<ProductTemplatePartModel>();
+		prodTempParts.add(new ProductTemplatePartModel(prodTempID, 1, 3));
+		prodTempParts.add(new ProductTemplatePartModel(prodTempID, 2, 10));
 	}
-	
+		
 	///////////
 	// GETTERS
 	
@@ -26,6 +37,14 @@ public class ProductTemplateModel {
 	
 	public String getProductTemplateDescription() {
 		return this.prodTempDesc;
+	}
+	
+	public int getProductTemplatePartsSize() {
+		return this.prodTempParts.size();
+	}
+	
+	public ProductTemplatePartModel getProdTempPartByIndex(int index) {
+		return this.prodTempParts.get(index);
 	}
 	
 	///////////
