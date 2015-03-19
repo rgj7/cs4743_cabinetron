@@ -115,6 +115,7 @@ public class InventoryItemDetailView extends JFrame {
 	
 	public void reload(){
 		InventoryItemModel itemModel = this.model.getInventoryItemByIndex(itemIndex);
+		itemTimeStamp = itemModel.getTimestamp();
 		itemIdTextField.setText(String.valueOf(itemModel.getItemID()));
 		itemPartComboBox.setSelectedItem(itemModel.getItemPart().getPartNumber());
 		itemLocationComboBox.setSelectedIndex(itemModel.getItemLocationIndex());
