@@ -18,14 +18,14 @@ public class InventoryItemModel {
 		this.setItemID(id);
 		this.setItemPart(part);
 		this.setItemLocationIndex(locationIndex);
-		this.setItemInitQuantity(quantity); // calls initial set method
+		this.setItemQuantity(quantity); // calls initial set method
 	}
 	
 	public InventoryItemModel(int id, PartModel part, int locationIndex, int quantity, Timestamp timestmp) {
 		this.setItemID(id);
 		this.setItemPart(part);
 		this.setItemLocationIndex(locationIndex);
-		this.setItemInitQuantity(quantity); // calls initial set method
+		this.setItemQuantity(quantity); // calls initial set method
 		this.timestmp = timestmp;
 	}
 	
@@ -84,13 +84,6 @@ public class InventoryItemModel {
 			throw new IllegalArgumentException("Item quantity must be zero or greater.");
 		}
 		this.itemQuantity = quantity;
-	}
-	
-	private void setItemInitQuantity(int quantity) {
-		if(quantity < 1) {
-			throw new IllegalArgumentException("Initial item quantity must be one or greater.");
-		}
-		this.setItemQuantity(quantity);
 	}
 
 	public void setTimestamp(Timestamp t) {

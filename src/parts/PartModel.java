@@ -65,6 +65,8 @@ public class PartModel {
 			throw new IllegalArgumentException("Part number is required");
 		} else if(number.length() > 20) {
 			throw new IllegalArgumentException("Part number is too long");
+		} else if(!number.startsWith("P")) {
+			throw new IllegalArgumentException("Part number must begin with 'P'");
 		}
 		// TODO: check for alpha/symbols
 		this.partNumber = number;

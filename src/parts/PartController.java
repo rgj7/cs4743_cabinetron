@@ -2,6 +2,7 @@ package parts;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import main.InventoryView;
 import main.InventoryModel;
@@ -33,7 +34,7 @@ public class PartController implements ActionListener {
 				partView.close();
 				view.update();
 				view.showMessage("Part was added successfully.");
-			} catch(IllegalArgumentException e) {
+			} catch(IllegalArgumentException | SQLException e) {
 				view.showMessage(e.getMessage());
 			}
 			
@@ -44,13 +45,17 @@ public class PartController implements ActionListener {
 				partView.close();
 				view.update();
 				view.showMessage("Part was edited successfully.");
-			} catch(IllegalArgumentException e) {
+			} catch(IllegalArgumentException | SQLException e) {
 				view.showMessage(e.getMessage());
 			}
 			
 		} else if(command.equals("Delete Part")) {
 			if(view.showWarningMsg("Are you sure you want to delete this part?") == 0) {
-				model.deletePart(partView.getPartID());
+				try {
+					model.deletePart(partView.getPartID());
+				} catch (SQLException e) {
+					view.showMessage(e.getMessage());
+				}
 			}
 			partView.close();
 			view.update();

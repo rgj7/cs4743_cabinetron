@@ -75,26 +75,18 @@ public class InventoryModel {
 	
 	// ITEMS
 	
-	public void addItem(String partNumber, int locationIndex, int quantity) {
+	public void addItem(String partNumber, int locationIndex, int quantity) throws SQLException {
 		int id = -1;
 		Timestamp t = null;
-		
+		if(quantity == 0) {
+			throw new IllegalArgumentException("Item quantity must be zero or greater.");
+		}
 		if(this.isUniqueItem(partNumber, locationIndex)) {
 			PartModel part = getPartByNumber(partNumber);
 			InventoryItemModel inventoryItem = new InventoryItemModel(lastItemID, part, locationIndex, quantity);
 			
-			try {
-				id = itemGateway.addItem(partNumber,InventoryItemModel.LOCATIONS[locationIndex], quantity);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
-			try {
-				t = this.itemGateway.getTimeStamp(id);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			id = itemGateway.addItem(partNumber,InventoryItemModel.LOCATIONS[locationIndex], quantity);
+			t = this.itemGateway.getTimeStamp(id);
             
 			inventoryItem.setTimestamp(t);
 			
@@ -110,58 +102,46 @@ public class InventoryModel {
 	}
 	
 	//needs to throw exception to be caught by controller, and passed on to view, to let them know when item timestamp mismatch (redo)
-	public void editItem(int itemID, String partNumber, int locationIndex, int quantity, Timestamp itemTime) throws DatabaseLockException {
-		
+	public void editItem(int itemID, String partNumber, int locationIndex, int quantity, Timestamp itemTime) throws DatabaseLockException, SQLException {
 		Timestamp t = null;
-		
-		if(this.isUniqueItem(partNumber, locationIndex)) {
-			PartModel part = getPartByNumber(partNumber);
-			InventoryItemModel editItem = getItemByID(itemID);
-			editItem.setItemPart(part);
-			editItem.setItemLocationIndex(locationIndex);
-			editItem.setItemQuantity(quantity);
-			try {
-				itemGateway.editItem(itemID, partNumber, InventoryItemModel.LOCATIONS[locationIndex], quantity, itemTime);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} catch (DatabaseLockException e){
-				throw new DatabaseLockException("Item out of Sync. Retry Edit");
-			}
-			  
-			try {
-				t = this.itemGateway.getTimeStamp(itemID);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			editItem.setTimestamp(t);
-			
-		} else {
-			throw new IllegalArgumentException("ITEM in same LOCATION already exists in inventory.");
-		}			
+		InventoryItemModel editItem = getItemByID(itemID);
+		if(!editItem.getItemPart().getPartNumber().equals(partNumber) || editItem.getItemLocationIndex() != locationIndex) {	
+			if(this.isUniqueItem(partNumber, locationIndex)) {
+				PartModel part = getPartByNumber(partNumber);
+				editItem.setItemPart(part);
+				editItem.setItemLocationIndex(locationIndex);
+			} else {
+				throw new IllegalArgumentException("ITEM in same LOCATION already exists in inventory.");
+			}	
+		}
+		editItem.setItemQuantity(quantity);
+		try {
+			itemGateway.editItem(itemID, partNumber, InventoryItemModel.LOCATIONS[locationIndex], quantity, itemTime);
+		} catch (DatabaseLockException e){
+			throw new DatabaseLockException("Item out of Sync. Retry Edit");
+		}
+		  
+		t = this.itemGateway.getTimeStamp(itemID);
+		editItem.setTimestamp(t);	
 	}
 	
-	public void deleteItem(int itemID) {
-		try {
-			itemGateway.deleteItem(itemID);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public void deleteItem(int itemID) throws SQLException {
 		InventoryItemModel delItem = getItemByID(itemID);
-		inventory.remove(delItem);
+		if(delItem.getItemQuantity() == 0) {
+			itemGateway.deleteItem(itemID);
+			inventory.remove(delItem);
+		} else {
+			throw new IllegalArgumentException("QUANTITY must be set to 0 for deletion.");
+		}	
 	}
 	
 	// PARTS
 	
-	public void addPart(String number, String name, int unitIndex, String externalNumber, String vendor) {
+	public void addPart(String number, String name, int unitIndex, String externalNumber, String vendor) throws SQLException {
 		int id = -1;
 		if(this.isUniquePart(number)) {
 			PartModel part = new PartModel(id, number, name, unitIndex, externalNumber, vendor);		
-			try {
-				id = partGateway.addPart(number,name,PartModel.UNITS[unitIndex],externalNumber, vendor);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			id = partGateway.addPart(number,name,PartModel.UNITS[unitIndex],externalNumber, vendor);
 			part.setPartID(id);
 			parts.add(part);
 			// TODO: This could screw up if two parts are added at same time??
@@ -171,30 +151,25 @@ public class InventoryModel {
 		}
 	}
 	
-	public void editPart(int id, String number, String name, int unitIndex, String externalNumber, String vendor) {
-		if(this.isUniquePart(number)) {
-			PartModel editPart = getPartByID(id);
-			editPart.setPartNumber(number);
-			editPart.setPartName(name);
-			editPart.setPartUnitIndex(unitIndex);
-			editPart.setExternalPartNumber(externalNumber);
-			editPart.setPartVendor(vendor);
-			try {
-				partGateway.editPart(id,  number,  name, PartModel.UNITS[unitIndex], externalNumber, vendor);
-			} catch (SQLException e) {
-				e.printStackTrace();
+	public void editPart(int id, String number, String name, int unitIndex, String externalNumber, String vendor) throws SQLException {
+		PartModel editPart = getPartByID(id);
+		if(!editPart.getPartNumber().equals(number)) {
+			if(isUniquePart(number)) {
+				editPart.setPartNumber(number);
+			} else {
+				throw new IllegalArgumentException("PART NUMBER already exists in part list.");
 			}
-		} else {
-			throw new IllegalArgumentException("PART NUMBER already exists in part list.");
 		}
+		editPart.setPartName(name);
+		editPart.setPartUnitIndex(unitIndex);
+		editPart.setExternalPartNumber(externalNumber);
+		editPart.setPartVendor(vendor);
+		partGateway.editPart(id, number, name, PartModel.UNITS[unitIndex], externalNumber, vendor);
 	}
 	
-	public void deletePart(int partId) {
-		try {
-			partGateway.deletePart(partId);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public void deletePart(int partId) throws SQLException {
+		
+		partGateway.deletePart(partId);
 		
 		// TODO: need to deal with deleting part that is referenced in inventory
 		// ( db may handle it on its own but would need to resync with db)
