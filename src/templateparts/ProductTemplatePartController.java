@@ -2,6 +2,7 @@ package templateparts;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import templates.ProductTemplateModel;
 import main.InventoryModel;
@@ -33,6 +34,7 @@ public class ProductTemplatePartController implements ActionListener {
 				// remove product template tab
 				view.getTabbedPane().remove(view.getTabbedPane().getSelectedIndex());
 				view.setCurrentTable(null);
+				model.clearProductTemplateParts();
 			}
 		} else if(command.equals("Add Part to Product Template")) {
 			ProductTemplatePartDetailView partView = new ProductTemplatePartDetailView(model, prodTempModel, -1);
@@ -41,10 +43,12 @@ public class ProductTemplatePartController implements ActionListener {
 			
 			try {
 				// add part to ptmodel
+				model.addTemplatePart(prodTempView.getProductTemplateID(), prodTempView.getProductTemplatePartID(), prodTempView.getItemQuantity());
+				System.out.println(prodTempView.getProductTemplateID());
 				prodTempView.close();
 				view.update();
 				view.showMessage("Part was added successfully.");
-			} catch(IllegalArgumentException e) {
+			} catch(IllegalArgumentException | SQLException e) {
 				view.showMessage(e.getMessage());
 			}
 			
@@ -52,16 +56,22 @@ public class ProductTemplatePartController implements ActionListener {
 			
 			try {
 				// edit part in ptmodel
+				model.editTemplatePart(prodTempView.getProductTemplateID(), prodTempView.getProductTemplatePartID(), prodTempView.getItemQuantity());
 				prodTempView.close();
 				view.update();
 				view.showMessage("Part was edited successfully.");
-			} catch(IllegalArgumentException e) {
+			} catch(IllegalArgumentException | SQLException e) {
 				view.showMessage(e.getMessage());
 			}
 			
 		} else if(command.equals("Delete")) {
 			if(view.showWarningMsg("Are you sure you want to delete this part?") == 0) {
-				// delete part in ptmodel
+				// delete part
+				try {
+					model.deleteTemplatePart(prodTempView.getProductTemplateID(), prodTempView.getProductTemplatePartID());
+				} catch (SQLException e) {
+					view.showMessage(e.getMessage());
+				}
 			}
 			prodTempView.close();
 			view.update();

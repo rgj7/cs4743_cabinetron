@@ -252,6 +252,21 @@ public class InventoryModel {
 		
 	}
 	
+	public void addTemplatePart(int temp_id, int part_id, int quant) throws SQLException {
+		templatePartGateway.addTemplatePart(temp_id, part_id, quant);
+		this.prodTempParts = templatePartGateway.loadTemplateParts(temp_id);
+	}
+	
+	public void editTemplatePart(int temp_id, int part_id, int quant) throws SQLException {
+		templatePartGateway.editTemplatePart(temp_id, part_id, quant);
+		this.prodTempParts = templatePartGateway.loadTemplateParts(temp_id);
+	}
+	
+	public void deleteTemplatePart(int temp_id, int part_id) throws SQLException {
+		templatePartGateway.deleteTemplatePart(temp_id, part_id);
+		loadTemplateParts(temp_id);
+	}
+	
 	// UTILITY METHODS
 	
 	private boolean isUniqueItem(String partNumber, int locationIndex) { // checks for same part/location
@@ -289,6 +304,7 @@ public class InventoryModel {
 	
 	public void loadTemplateParts(int index) throws SQLException {
 		this.prodTempParts = templatePartGateway.loadTemplateParts(index);
+		System.out.println(this.prodTempParts.toString());
 	}
 	
 	public ProductTemplatePartModel getProdTempPartByIndex(int index) {
@@ -300,6 +316,10 @@ public class InventoryModel {
 			return 0;
 		else
 			return this.prodTempParts.size();
+	}
+	
+	public void clearProductTemplateParts() {
+		this.prodTempParts.clear();
 	}
 	
 	public int getLastItemID() {

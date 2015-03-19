@@ -77,18 +77,20 @@ public class TemplatePartGateway {
         		                  + "WHERE template_id = ?");
         sRS.setInt(1,id);
         rs = sRS.executeQuery();
-        rs.first();
+        //rs.first();
        
-    	boolean moreTParts = false;
-        do{
+    	//boolean moreTParts = false;
+        //do{
+        while(rs.next()) {
         	ProductTemplatePartModel i = null;
         	int temp_id = rs.getInt("template_id");     
         	int quant = rs.getInt("quantity");
         	int partId = rs.getInt("part_id");
         	i = new ProductTemplatePartModel(temp_id, partId, quant);
         	templateParts.add(i);
-		    moreTParts = rs.next();
-        } while(moreTParts);
+		    //moreTParts = rs.next();
+        //} while(moreTParts);
+        }
         
         return templateParts;
 	}
@@ -105,7 +107,7 @@ public class TemplatePartGateway {
 		sRS.execute();
 	}
 	
-	public void editTemplatePart(int temp_id, int part_id, int quant) throws SQLException, DatabaseLockException{
+	public void editTemplatePart(int temp_id, int part_id, int quant) throws SQLException {
 
 		sRS = null;
 		sRS = conn.prepareStatement("UPDATE  template_part" +
@@ -117,10 +119,11 @@ public class TemplatePartGateway {
 		sRS.executeUpdate();			
 	}
 	
-	public void deleteTemplatePart(int temp_id) throws SQLException{
+	public void deleteTemplatePart(int temp_id, int part_id) throws SQLException{
 		sRS = null;
-		sRS = conn.prepareStatement("DELETE FROM template_part WHERE template_id = ?");
+		sRS = conn.prepareStatement("DELETE FROM template_part WHERE template_id = ? AND part_id = ?");
 		sRS.setInt(1, temp_id);
+		sRS.setInt(2, part_id);
 		sRS.execute();
 	}
 	

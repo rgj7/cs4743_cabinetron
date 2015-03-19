@@ -107,12 +107,6 @@ public class InventoryView extends JFrame {
 	}
 		
 	public void addProductTemplateTab(int prodTempIndex) {
-		try {
-			model.loadTemplateParts(prodTempIndex);
-			
-		} catch (SQLException e) {
-			showMessage("TEST" + e.getMessage());
-		}
 		ProductTemplateModel prodTempModel = model.getProdTempByIndex(prodTempIndex);
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
@@ -178,7 +172,7 @@ public class InventoryView extends JFrame {
 		// TODO: move from InventoryController to respective XController
 		inventoryItemView.registerListeners(controller1, controller2);
 		partView.registerListeners(controller1, new PartTableController(model, this));
-		prodTempView.registerListeners(controller1, new ProductTemplateTableController(model, this, null));
+		prodTempView.registerListeners(controller1, new ProductTemplateTableController(model, this));
 	}
 	
 	// GETTERS
@@ -220,6 +214,9 @@ public class InventoryView extends JFrame {
 		partView.update();
 		inventoryItemView.update();
 		prodTempView.update();
+		
+		if(currentTable != null)
+			currentTable.revalidate();
 		
 		this.revalidate();
 		this.repaint();
