@@ -1,4 +1,4 @@
-package cabinetron3;
+package database;
 
 public class DatabaseLockException extends Exception {
 	public DatabaseLockException(String s) {

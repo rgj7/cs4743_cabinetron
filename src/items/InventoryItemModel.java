@@ -1,5 +1,7 @@
 package items;
 
+import java.sql.Timestamp;
+
 import parts.PartModel;
 
 public class InventoryItemModel {
@@ -7,6 +9,7 @@ public class InventoryItemModel {
 	
 	private int itemId, itemLocationIndex, itemQuantity;
 	private PartModel itemPart;
+	private Timestamp timestmp;
 	
 	////////////////
 	// CONSTRUCTOR
@@ -16,6 +19,14 @@ public class InventoryItemModel {
 		this.setItemPart(part);
 		this.setItemLocationIndex(locationIndex);
 		this.setItemInitQuantity(quantity); // calls initial set method
+	}
+	
+	public InventoryItemModel(int id, PartModel part, int locationIndex, int quantity, Timestamp timestmp) {
+		this.setItemID(id);
+		this.setItemPart(part);
+		this.setItemLocationIndex(locationIndex);
+		this.setItemInitQuantity(quantity); // calls initial set method
+		this.timestmp = timestmp;
 	}
 	
 	///////////
@@ -39,6 +50,10 @@ public class InventoryItemModel {
 	
 	public int getItemQuantity() {
 		return this.itemQuantity;
+	}
+	
+	public Timestamp getTimestamp(){
+		return this.timestmp;
 	}
 	
 	///////////
@@ -76,5 +91,10 @@ public class InventoryItemModel {
 			throw new IllegalArgumentException("Initial item quantity must be one or greater.");
 		}
 		this.setItemQuantity(quantity);
+	}
+
+	public void setTimestamp(Timestamp t) {
+		this.timestmp = t;
+		
 	}
 }

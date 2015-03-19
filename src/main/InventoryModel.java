@@ -3,8 +3,10 @@ package main;
 import items.InventoryItemModel;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import database.DatabaseLockException;
 import database.ItemTableGateway;
 import database.PartTableGateway;
 import parts.PartModel;
@@ -28,6 +30,7 @@ public class InventoryModel {
 	public InventoryModel(PartTableGateway ptg, ItemTableGateway itg) {
 		this.partGateway = ptg;
 		this.itemGateway = itg;
+		this.inventory = new ArrayList<InventoryItemModel>();
 		
 		//loads parts from database
 		try {
@@ -66,6 +69,8 @@ public class InventoryModel {
 	
 	public void addItem(String partNumber, int locationIndex, int quantity) {
 		int id = -1;
+		Timestamp t = null;
+		
 		if(this.isUniqueItem(partNumber, locationIndex)) {
 			PartModel part = getPartByNumber(partNumber);
 			InventoryItemModel inventoryItem = new InventoryItemModel(lastItemID, part, locationIndex, quantity);
@@ -75,6 +80,16 @@ public class InventoryModel {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+			
+			try {
+				t = this.itemGateway.getTimeStamp(id);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
+			inventoryItem.setTimestamp(t);
+			
 			inventoryItem.setItemID(id);
 			inventory.add(inventoryItem);
 			
@@ -86,7 +101,11 @@ public class InventoryModel {
 
 	}
 	
-	public void editItem(int itemID, String partNumber, int locationIndex, int quantity) {
+	//needs to throw exception to be caught by controller, and passed on to view, to let them know when item timestamp mismatch (redo)
+	public void editItem(int itemID, String partNumber, int locationIndex, int quantity, Timestamp itemTime) throws DatabaseLockException {
+		
+		Timestamp t = null;
+		
 		if(this.isUniqueItem(partNumber, locationIndex)) {
 			PartModel part = getPartByNumber(partNumber);
 			InventoryItemModel editItem = getItemByID(itemID);
@@ -94,10 +113,21 @@ public class InventoryModel {
 			editItem.setItemLocationIndex(locationIndex);
 			editItem.setItemQuantity(quantity);
 			try {
-				itemGateway.editItem(itemID, partNumber, InventoryItemModel.LOCATIONS[locationIndex], quantity);
+				itemGateway.editItem(itemID, partNumber, InventoryItemModel.LOCATIONS[locationIndex], quantity, itemTime);
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}			
+			} catch (DatabaseLockException e){
+				throw new DatabaseLockException("Item out of Sync. Retry Edit");
+			}
+			  
+			try {
+				t = this.itemGateway.getTimeStamp(itemID);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			editItem.setTimestamp(t);
+			
 		} else {
 			throw new IllegalArgumentException("ITEM in same LOCATION already exists in inventory.");
 		}			
@@ -301,5 +331,24 @@ public class InventoryModel {
 			partNumbers[i] = parts.get(i).getPartNumber();
 		}
 		return partNumbers;
+	}
+	
+	public void reloadInventory(){
+		//loads parts from database
+				try {
+					this.parts = partGateway.loadParts();
+					parts.toString();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
+				try {
+					this.inventory = itemGateway.loadItems();
+				} catch (SQLException e) {
+					System.out.println("load items exception");
+					e.printStackTrace();
+				}
+				this.lastItemID = itemGateway.getLastID() + 1; // TODO: get last item id from database
+				this.lastPartID = partGateway.getLastID() + 1;
 	}
 }

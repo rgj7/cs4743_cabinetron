@@ -1,4 +1,4 @@
-package cabinetron3;
+package main;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -6,13 +6,12 @@ import java.awt.event.ActionListener;
 public class ReloadController implements ActionListener {
 
 	private InventoryModel model;
-	private InventoryListView view;
+	private InventoryView view;
 
-	
 	////////////////
 	// CONSTRUCTOR
 	
-	public ReloadController(InventoryModel model, InventoryListView view) {
+	public ReloadController(InventoryModel model, InventoryView view) {
 		this.model = model;
 		this.view = view;
 	}

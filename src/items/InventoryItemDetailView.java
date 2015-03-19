@@ -1,6 +1,7 @@
 package items;
 
 import java.awt.Component;
+import java.sql.Timestamp;
 import java.text.NumberFormat;
 
 import javax.swing.*;
@@ -17,13 +18,17 @@ public class InventoryItemDetailView extends JFrame {
 	private JTextField itemIdTextField;
 	private JFormattedTextField itemQuantityTextField;
 	private JComboBox<String> itemLocationComboBox, itemPartComboBox;
-	
+	private InventoryModel model;
+	private int itemIndex;
+	private Timestamp itemTimeStamp;
 	////////////////
 	// CONSTRUCTOR
 	
 	public InventoryItemDetailView(InventoryModel model, InventoryView view, int itemIndex) {
 		super("Item Details");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.itemIndex = itemIndex;
+		this.model = model;
 		
 		MigLayout layout = new MigLayout("wrap 2", "[right]10[grow,fill]", "[]10[]");
 		formPanel = new JPanel(layout);
@@ -70,6 +75,7 @@ public class InventoryItemDetailView extends JFrame {
 		if(itemIndex != model.getLastItemID()) { // don't get values if new item
 			// get inventory item
 			InventoryItemModel itemModel = model.getInventoryItemByIndex(itemIndex);
+			itemTimeStamp = itemModel.getTimestamp();
 			itemIdTextField.setText(String.valueOf(itemModel.getItemID()));
 			itemPartComboBox.setSelectedItem(itemModel.getItemPart().getPartNumber());
 			itemLocationComboBox.setSelectedIndex(itemModel.getItemLocationIndex());
@@ -109,6 +115,15 @@ public class InventoryItemDetailView extends JFrame {
 		this.dispose();
 	}
 	
+	public void reload(){
+		InventoryItemModel itemModel = this.model.getInventoryItemByIndex(itemIndex);
+		itemTimeStamp = itemModel.getTimestamp();
+		itemIdTextField.setText(String.valueOf(itemModel.getItemID()));
+		itemPartComboBox.setSelectedItem(itemModel.getItemPart().getPartNumber());
+		itemLocationComboBox.setSelectedIndex(itemModel.getItemLocationIndex());
+		itemQuantityTextField.setText(String.valueOf(itemModel.getItemQuantity()));
+	}
+	
 	/////////////
 	// GETTERS
 	
@@ -126,5 +141,9 @@ public class InventoryItemDetailView extends JFrame {
 	
 	public int getItemQuantity() {
 		return Integer.parseInt(itemQuantityTextField.getText());
+	}
+	
+	public Timestamp getTimestamp(){
+		return this.itemTimeStamp;
 	}
 }
