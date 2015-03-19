@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import database.DatabaseLockException;
 import database.ItemTableGateway;
 import database.PartTableGateway;
+import database.ProductTemplateGateway;
+import database.TemplatePartGateway;
 import parts.PartModel;
+import templateparts.ProductTemplatePartModel;
 import templates.ProductTemplateModel;
 
 public class InventoryModel {
@@ -17,20 +20,26 @@ public class InventoryModel {
 	public static final String[] PARTFIELDS = {"PARTID", "NUMBER", "NAME", "UNIT", "EXTERNAL", "VENDOR"};
 	public static final String[] PRODTEMPFIELDS = {"PTID", "NUMBER", "DESCRIPTION"};
 	
-	PartTableGateway partGateway = null; 
-	ItemTableGateway itemGateway = null;
+	private PartTableGateway partGateway = null; 
+	private ItemTableGateway itemGateway = null;
+	private ProductTemplateGateway productGateway = null;
+	private TemplatePartGateway templatePartGateway = null;
+	
 	private ArrayList<InventoryItemModel> inventory;
 	private ArrayList<PartModel> parts;
 	private ArrayList<ProductTemplateModel> productTemplates;
+	private ArrayList<ProductTemplatePartModel> prodTempParts;
 	private int lastItemID, lastPartID, lastProdTempID;
 	
-	// DEBUG
-	private ProductTemplateModel ptTest1, ptTest2, ptTest3;
-	
-	public InventoryModel(PartTableGateway ptg, ItemTableGateway itg) {
+
+	public InventoryModel(PartTableGateway ptg, ItemTableGateway itg, ProductTemplateGateway pg, TemplatePartGateway tpg) {
 		this.partGateway = ptg;
 		this.itemGateway = itg;
-		this.inventory = new ArrayList<InventoryItemModel>();
+		this.productGateway = pg;
+		this.templatePartGateway = tpg;
+		
+		this.prodTempParts = new ArrayList<ProductTemplatePartModel>();
+		//prodTempParts.add(new ProductTemplatePartModel(1,1,10));
 		
 		//loads parts from database
 		try {
@@ -47,19 +56,18 @@ public class InventoryModel {
 			e.printStackTrace();
 		}
 		
-		// DEBUG
-		productTemplates = new ArrayList<ProductTemplateModel>();
-		ptTest1 = new ProductTemplateModel(1, "A1234", "Cabinet drawer");
-		ptTest2 = new ProductTemplateModel(2, "A647X", "Basic Oak Cabinet");
-		ptTest3 = new ProductTemplateModel(3, "A456Q", "Style1 Pine Cabinet");
-		productTemplates.add(ptTest1);
-		productTemplates.add(ptTest2);
-		productTemplates.add(ptTest3);
-		this.lastProdTempID = 4; // 3+1
+		try {
+			this.productTemplates = productGateway.loadProducts();
+		} catch (SQLException e){
+			System.out.println("load product templates exception");
+			e.printStackTrace();
+		}
 		
+
 		// get last id
 		this.lastItemID = itemGateway.getLastID() + 1;
 		this.lastPartID = partGateway.getLastID() + 1;
+		this.lastProdTempID = productGateway.getLastID() + 1;
 	}
 	
 	///////////
@@ -209,16 +217,38 @@ public class InventoryModel {
 		int id = -1;
 		
 		ProductTemplateModel newProdTemp = new ProductTemplateModel(id, name, desc);
-		newProdTemp.setProductTemplateID(lastProdTempID);
+		
+		try{
+			id = productGateway.addTemplate(name, desc);		
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+	    
+		newProdTemp.setProductTemplateID(id);
 		productTemplates.add(newProdTemp);
-		
+	    this.lastProdTempID++;
 	}
 	
-	public void editProductTemplate(int prodTempId) {
-		
+	
+	public void editProductTemplate(int prodTempId, String number, String desc) {
+		ProductTemplateModel editTemplate = getProductByID(prodTempId);
+		editTemplate.setProductTemplateNumber(number);
+		editTemplate.setProductTemplateDescription(desc);
+		try {
+			productGateway.editTemplate(prodTempId, number, desc);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void deleteProductTemplate(int prodTempId) {
+	public void deleteProductTemplate(int prodTempId) throws SQLException  {
+		try {
+			productGateway.deleteTemplate(prodTempId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		productTemplates = productGateway.loadProducts();
 		
 	}
 	
@@ -255,6 +285,21 @@ public class InventoryModel {
 	
 	public ProductTemplateModel getProdTempByIndex(int index) {
 		return this.productTemplates.get(index);
+	}
+	
+	public void loadTemplateParts(int index) throws SQLException {
+		this.prodTempParts = templatePartGateway.loadTemplateParts(index);
+	}
+	
+	public ProductTemplatePartModel getProdTempPartByIndex(int index) {
+		return this.prodTempParts.get(index);
+	}
+	
+	public int getProductTemplatePartsSize() {
+		if(this.prodTempParts.isEmpty())
+			return 0;
+		else
+			return this.prodTempParts.size();
 	}
 	
 	public int getLastItemID() {
@@ -298,6 +343,17 @@ public class InventoryModel {
 		}
 		return null;
 	}
+	
+	public ProductTemplateModel getProductByID(int productID) {
+		for(ProductTemplateModel product : productTemplates) {
+			if(product.getProductTemplateID() == productID) {
+				return product;
+			}
+		}
+		return null;
+	}
+	
+	
 	
 	public PartModel getPartByName(String name) {
 		for(PartModel part : parts) {
@@ -348,6 +404,13 @@ public class InventoryModel {
 					System.out.println("load items exception");
 					e.printStackTrace();
 				}
+				
+				try {
+					this.productTemplates = productGateway.loadProducts();
+				} catch (SQLException e){
+					e.printStackTrace();
+				}
+				
 				this.lastItemID = itemGateway.getLastID() + 1; // TODO: get last item id from database
 				this.lastPartID = partGateway.getLastID() + 1;
 	}

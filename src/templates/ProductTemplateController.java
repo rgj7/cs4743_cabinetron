@@ -2,6 +2,7 @@ package templates;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import main.InventoryView;
 import main.InventoryModel;
@@ -38,7 +39,7 @@ public class ProductTemplateController implements ActionListener {
 		} else if(command.equals("Edit")) {
 			
 			try {
-				//model.editProductTemplate(prodTempView.getProductTemplateID(), prodTempView.getProductTemplateNumber(), prodTempView.getProductTemplateDescription());
+				model.editProductTemplate(prodTempView.getProductTemplateID(), prodTempView.getProductTemplateNumber(), prodTempView.getProductTemplateDescription());
 				prodTempView.close();
 				view.update();
 				view.showMessage("Product template was edited successfully.");
@@ -48,7 +49,12 @@ public class ProductTemplateController implements ActionListener {
 			
 		} else if(command.equals("Delete")) {
 			if(view.showWarningMsg("Are you sure you want to delete this product template?") == 0) {
-				//model.deleteProductTemplate(prodTempView.getProductTemplateID());
+				try {
+					model.deleteProductTemplate(prodTempView.getProductTemplateID());
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					view.showMessage(e.getMessage());
+				}
 			}
 			prodTempView.close();
 			view.update();

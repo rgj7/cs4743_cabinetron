@@ -28,20 +28,20 @@ public class ProductTemplatePartTableModel extends AbstractTableModel {
 
 	@Override
 	public int getRowCount() {
-		return this.model.getProductTemplatePartsSize();
+		return this.inventoryModel.getProductTemplatePartsSize();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) {
 		switch(ProductTemplateModel.PARTFIELDS[column]) {
 			case "PTID":
-				return this.model.getProdTempPartByIndex(row).getProductTemplateID();
+				return this.inventoryModel.getProdTempPartByIndex(row).getProductTemplateID();
 			case "PART ID":
-				return this.model.getProdTempPartByIndex(row).getPartID();
+				return this.inventoryModel.getProdTempPartByIndex(row).getPartID();
 			case "PART NAME":
-				return this.inventoryModel.getPartByID(this.model.getProdTempPartByIndex(row).getPartID()).getPartName();
+				return this.inventoryModel.getPartByID(this.inventoryModel.getProdTempPartByIndex(row).getPartID()).getPartName();
 			case "QUANTITY":
-				return this.model.getProdTempPartByIndex(row).getPartQuantity();
+				return this.inventoryModel.getProdTempPartByIndex(row).getPartQuantity();
 			default:
 				return null;
 		}

@@ -11,17 +11,11 @@ public class ProductTemplateModel {
 	// TODO: create supplemental fields if needed (date_added, last_modified, etc.)
 	private int prodTempID;
 	private String prodTempNumber, prodTempDesc;
-	private ArrayList<ProductTemplatePartModel> prodTempParts;
 	
 	public ProductTemplateModel(int id, String number, String desc) {
 		setProductTemplateID(id);
 		setProductTemplateNumber(number);
 		setProductTemplateDescription(desc);
-		
-		// DEBUG
-		this.prodTempParts = new ArrayList<ProductTemplatePartModel>();
-		prodTempParts.add(new ProductTemplatePartModel(prodTempID, 1, 3));
-		prodTempParts.add(new ProductTemplatePartModel(prodTempID, 2, 10));
 	}
 		
 	///////////
@@ -37,14 +31,6 @@ public class ProductTemplateModel {
 	
 	public String getProductTemplateDescription() {
 		return this.prodTempDesc;
-	}
-	
-	public int getProductTemplatePartsSize() {
-		return this.prodTempParts.size();
-	}
-	
-	public ProductTemplatePartModel getProdTempPartByIndex(int index) {
-		return this.prodTempParts.get(index);
 	}
 	
 	///////////

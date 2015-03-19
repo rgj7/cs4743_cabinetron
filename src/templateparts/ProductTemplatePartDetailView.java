@@ -78,7 +78,7 @@ public class ProductTemplatePartDetailView extends JFrame {
 		
 		if(prodTempPartIndex >= 0) { // don't get values if new item
 			// get inventory item
-			ProductTemplatePartModel prodTempPartModel = model.getProdTempPartByIndex(prodTempPartIndex);
+			ProductTemplatePartModel prodTempPartModel = inventoryModel.getProdTempPartByIndex(prodTempPartIndex);
 			prodTempIDTextField.setText(String.valueOf(prodTempPartModel.getProductTemplateID()));
 			partIDTextField.setText(String.valueOf(prodTempPartModel.getPartID()));
 			itemPartComboBox.setSelectedItem(inventoryModel.getPartByID(prodTempPartModel.getPartID()).getPartName());

@@ -6,6 +6,8 @@ import javax.swing.Timer;
 import database.GatewayException;
 import database.ItemTableGateway;
 import database.PartTableGateway;
+import database.ProductTemplateGateway;
+import database.TemplatePartGateway;
 
 public class Inventory {
 	public static void main(String[] args) {
@@ -26,8 +28,24 @@ public class Inventory {
 			System.exit(0);
 		}
 		
+		ProductTemplateGateway pg = null;
+		try{
+			pg = new ProductTemplateGateway();
+		} catch(GatewayException e){
+			System.out.println("Error creating DB connection: " + e.getMessage());
+			System.exit(0);
+		}
+		
+		TemplatePartGateway tpg = null;
+		try{
+			tpg = new TemplatePartGateway();
+		} catch(GatewayException e){
+			System.out.println("Error creating DB connection: " + e.getMessage());
+			System.exit(0);
+		}
+		
 		// model
-		InventoryModel model = new InventoryModel(ptg, itg);
+		InventoryModel model = new InventoryModel(ptg, itg, pg, tpg);
 		// view
 		InventoryView view = new InventoryView(model);
 		// controllers
@@ -45,7 +63,7 @@ public class Inventory {
 		view.setVisible(true);
          
 		Timer timer = new Timer(2000, reloadController);
-		timer.start();
+	    timer.start();
 				
 	}
 }

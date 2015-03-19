@@ -4,6 +4,7 @@ import items.InventoryItemView;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.sql.SQLException;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -106,6 +107,12 @@ public class InventoryView extends JFrame {
 	}
 		
 	public void addProductTemplateTab(int prodTempIndex) {
+		try {
+			model.loadTemplateParts(prodTempIndex);
+			
+		} catch (SQLException e) {
+			showMessage("TEST" + e.getMessage());
+		}
 		ProductTemplateModel prodTempModel = model.getProdTempByIndex(prodTempIndex);
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
@@ -171,7 +178,7 @@ public class InventoryView extends JFrame {
 		// TODO: move from InventoryController to respective XController
 		inventoryItemView.registerListeners(controller1, controller2);
 		partView.registerListeners(controller1, new PartTableController(model, this));
-		prodTempView.registerListeners(controller1, new ProductTemplateTableController(model, this));
+		prodTempView.registerListeners(controller1, new ProductTemplateTableController(model, this, null));
 	}
 	
 	// GETTERS
