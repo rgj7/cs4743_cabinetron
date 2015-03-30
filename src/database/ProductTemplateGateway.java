@@ -1,5 +1,4 @@
 package database;
-import items.InventoryItemModel;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,20 +7,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import parts.PartModel;
-import templateparts.ProductTemplatePartModel;
 import templates.ProductTemplateModel;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-
-import database.DatabaseLockException;
 
 public class ProductTemplateGateway {
 	
