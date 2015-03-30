@@ -3,6 +3,10 @@ package main;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
+import login.AuthenticatorModel;
+import login.LoginController;
+import login.LoginView;
+import login.SessionModel;
 import database.GatewayException;
 import database.ItemTableGateway;
 import database.PartTableGateway;
@@ -11,6 +15,32 @@ import database.TemplatePartGateway;
 
 public class Inventory {
 	public static void main(String[] args) {
+	
+		SessionModel session = null;
+
+		while(session == null){
+		   boolean actionOccured = false;
+		   AuthenticatorModel authenticator = new AuthenticatorModel(session);
+		   LoginView loginview = new LoginView();
+		   LoginController loginController = new LoginController(authenticator, loginview);
+		   loginview.registerListeners(loginController);
+		   while(!loginController.hasActionOccured()){
+			   try {
+				   Thread.sleep(1000);
+			   } catch (InterruptedException e) {
+				   e.printStackTrace();
+			   }
+		   }
+           session = authenticator.getSession();
+	//TESTING TESTING
+           if(session == null){
+		      System.out.println("session is null");
+		   }
+		   else{
+		      System.out.println(session.getUser().getName());
+		   }
+		}
+        
 		
 		PartTableGateway ptg = null;
 		try {
