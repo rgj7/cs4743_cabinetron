@@ -94,7 +94,7 @@ public class PartTableGateway {
 	public int getLastID(){
 		return this.lastID;
 	}
-	
+		
 	public PartModel getPart(int part_id) throws SQLException {
 		sRS = null;
 		rs = null;
@@ -103,16 +103,17 @@ public class PartTableGateway {
 		sRS = conn.prepareStatement("select * from part where id = ?");
 		sRS.setInt(1, part_id);
 		rs = sRS.executeQuery();
-		rs.first();
-		String num = rs.getString("part_number");
-    	String name = rs.getString("part_name");
-    	String unit = rs.getString("unit_quantity");
-    	String exnum = rs.getString("external_part_num");
-    	String vend = rs.getString("vendor");
-    	if(unit.equals("Unknown")) unitIndex = 0;
-    	if(unit.equals("Linear Feet")) unitIndex = 1;
-    	if(unit.equals("Pieces")) unitIndex = 2;
-    	p = new PartModel(part_id, num, name, unitIndex, exnum, vend);
+		if(rs.first()) {
+			String num = rs.getString("part_number");
+	    	String name = rs.getString("part_name");
+	    	String unit = rs.getString("unit_quantity");
+	    	String exnum = rs.getString("external_part_num");
+	    	String vend = rs.getString("vendor");
+	    	if(unit.equals("Unknown")) unitIndex = 0;
+	    	if(unit.equals("Linear Feet")) unitIndex = 1;
+	    	if(unit.equals("Pieces")) unitIndex = 2;
+	    	p = new PartModel(part_id, num, name, unitIndex, exnum, vend);
+		}
 		return p;
 		
 	}

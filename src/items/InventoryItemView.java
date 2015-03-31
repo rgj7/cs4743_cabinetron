@@ -35,6 +35,8 @@ public class InventoryItemView extends JPanel {
 		    column = inventoryTable.getColumnModel().getColumn(i);
 		    if(InventoryModel.ITEMFIELDS[i].equals("ITEMID") || InventoryModel.ITEMFIELDS[i].equals("QUANTITY")) {
 		        column.setPreferredWidth(50);
+		    } else if(InventoryModel.ITEMFIELDS[i].equals("PART #") || InventoryModel.ITEMFIELDS[i].equals("PROD #")) {
+			    column.setPreferredWidth(100);
 		    } else {
 		        column.setPreferredWidth(200);
 		    }

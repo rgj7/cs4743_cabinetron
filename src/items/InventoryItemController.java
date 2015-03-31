@@ -32,7 +32,11 @@ public class InventoryItemController implements ActionListener {
 		if(command.equals("Add Item")) {
 			
 			try {
-				model.addItem(itemView.getItemPartNumber(), itemView.getItemLocationIndex(), itemView.getItemQuantity());
+				if(itemView.getItemType().equals("Part")) {
+					model.addItem(itemView.getItemPartNumber(), itemView.getItemLocationIndex(), itemView.getItemQuantity());
+				} else if(itemView.getItemType().equals("Product")) {
+					model.addItemProduct(itemView.getItemTemplateNumber(), itemView.getItemLocationIndex(), itemView.getItemQuantity());
+				}
 				itemView.close();
 				view.update();
 				view.showMessage("Item was added successfully.");
