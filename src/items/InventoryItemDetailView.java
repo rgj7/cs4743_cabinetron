@@ -49,7 +49,7 @@ public class InventoryItemDetailView extends JFrame {
 		
 		// Field: PART
 		itemPartComboBox = new JComboBox<String>(model.getPartNumbers()); 
-		JLabel itemPartLabel = new JLabel("Part");
+		JLabel itemPartLabel = new JLabel("Part Number");
 		itemPartLabel.setLabelFor(itemPartComboBox);
 		
 		// Field: TEMPLATE
@@ -58,7 +58,6 @@ public class InventoryItemDetailView extends JFrame {
 		JLabel itemTemplateLabel = new JLabel("Product Template");
 		itemTemplateLabel.setLabelFor(itemTemplateComboBox);
 		
-				
 		// Field: LOCATION
 		itemLocationComboBox = new JComboBox<String>(InventoryItemModel.LOCATIONS);
 		JLabel itemLocationLabel = new JLabel("Location");
@@ -97,12 +96,15 @@ public class InventoryItemDetailView extends JFrame {
 			InventoryItemModel itemModel = model.getInventoryItemByIndex(itemIndex);
 			itemTimeStamp = itemModel.getTimestamp();
 			itemIdTextField.setText(String.valueOf(itemModel.getItemID()));
-			itemPartComboBox.setSelectedItem(itemModel.getItemPart().getPartNumber());
+			if(itemModel.getItemProductTemplateID() == 0) {
+				itemPartComboBox.setSelectedItem(itemModel.getItemPart().getPartNumber());
+			}
 			itemLocationComboBox.setSelectedIndex(itemModel.getItemLocationIndex());
 			itemQuantityTextField.setText(String.valueOf(itemModel.getItemQuantity()));
 			
 			if(itemModel.getItemProductTemplateID() != 0) {
 				itemPartOrProduct.setSelectedItem("Product");
+				itemPartComboBox.setEnabled(false);
 				itemTemplateComboBox.setEnabled(true);
 			} else {
 				itemPartOrProduct.setSelectedItem("Part");
@@ -110,10 +112,12 @@ public class InventoryItemDetailView extends JFrame {
 			itemPartOrProduct.setEnabled(false); // can't change after added
 			
 			// initialize and add "edit/delete" buttons
-			JButton editItemButton = new JButton("Edit Item");
-			JButton deleteItemButton = new JButton("Delete Item");
-			formPanel.add(editItemButton, "skip, split 2");
-			formPanel.add(deleteItemButton, "");
+			if(itemModel.getItemProductTemplateID() == 0) {
+				JButton editItemButton = new JButton("Edit Item");
+				JButton deleteItemButton = new JButton("Delete Item");
+				formPanel.add(editItemButton, "skip, split 2");
+				formPanel.add(deleteItemButton, "");
+			}
 		} else {			
 			// sets item id to next available id
 			itemIdTextField.setText(String.valueOf(model.getLastItemID()));

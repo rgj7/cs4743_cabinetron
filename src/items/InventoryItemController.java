@@ -40,14 +40,18 @@ public class InventoryItemController implements ActionListener {
 				itemView.close();
 				view.update();
 				view.showMessage("Item was added successfully.");
-			} catch(IllegalArgumentException | SQLException e) {
+			} catch(IllegalArgumentException | SQLException | DatabaseLockException e) {
 				view.showMessage(e.getMessage());
 			}
 			
 		} else if(command.equals("Edit Item")) {
 			try {
-				model.editItem(itemView.getItemID(), itemView.getItemPartNumber(), itemView.getItemLocationIndex(), 
-			    		      itemView.getItemQuantity(), itemView.getTimestamp());
+				if(itemView.getItemType().equals("Part")) {
+					model.editItem(itemView.getItemID(), itemView.getItemPartNumber(), itemView.getItemLocationIndex(), 
+			    		     itemView.getItemQuantity(), itemView.getTimestamp());
+				} else if(itemView.getItemType().equals("Product")) {
+					
+				}
 				itemView.close();
 				view.update();
 				view.showMessage("Item was edited successfully.");

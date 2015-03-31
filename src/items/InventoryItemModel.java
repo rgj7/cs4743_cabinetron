@@ -17,6 +17,7 @@ public class InventoryItemModel {
 	public InventoryItemModel(int id, PartModel part, int prodTempID, int locationIndex, int quantity) {
 		this.setItemID(id);
 		this.setItemPart(part);
+		this.setItemProductTemplateID(prodTempID);
 		this.setItemLocationIndex(locationIndex);
 		this.setItemQuantity(quantity);
 	}
@@ -24,6 +25,7 @@ public class InventoryItemModel {
 	public InventoryItemModel(int id, PartModel part, int prodTempID, int locationIndex, int quantity, Timestamp ts) {
 		this.setItemID(id);
 		this.setItemPart(part);
+		this.setItemProductTemplateID(prodTempID);
 		this.setItemLocationIndex(locationIndex);
 		this.setItemQuantity(quantity);
 		this.setTimestamp(ts);

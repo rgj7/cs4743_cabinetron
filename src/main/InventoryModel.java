@@ -73,7 +73,16 @@ public class InventoryModel {
 	
 	// PRODUCT
 	
-	public void addItemProduct(String templateNumber, int locationIndex, int quantity) throws SQLException {
+	public void addItemProduct(String templateNumber, int locationIndex, int quantity) throws SQLException, DatabaseLockException {
+		int id = -1;
+		Timestamp t = null;
+		if(quantity == 0) {
+			throw new IllegalArgumentException("Item quantity must be zero or greater.");
+		}
+		if(locationIndex == 0) {
+			throw new IllegalArgumentException("Location must be set. Cannot be Unknown.");
+		}
+		
 		ProductTemplateModel prodTemp = getProductTemplateByNumber(templateNumber);
 		int prodTempID = prodTemp.getProductTemplateID();
 		
@@ -81,24 +90,46 @@ public class InventoryModel {
 		loadTemplateParts(prodTempID);
 		
 		// check inventory quantity
-		for(ProductTemplatePartModel prodTempPart : prodTempParts) {
-			if(getQuantityByPartID(prodTempPart.getPartID()) < prodTempPart.getPartQuantity()*quantity) {
-				throw new IllegalArgumentException("Not enough parts to create this product.");
+		boolean haveParts = false;
+		int partsAtLocation = 0;
+		// go through all locations
+		for(int i = 1; i <= 3; i++) {
+			haveParts = true;
+			for(ProductTemplatePartModel prodTempPart : prodTempParts) {
+				if(getQuantityAtLocation(prodTempPart.getPartID(), i) < prodTempPart.getPartQuantity()*quantity) {
+					haveParts = false;
+				}
+			}
+			// true if parts are all at one location
+			if(haveParts == true) {
+				partsAtLocation = i;
+				break;
 			}
 		}
 		
-		int id = -1;
-		// add product
-		id = itemGateway.addItemProduct(prodTempID, InventoryItemModel.LOCATIONS[locationIndex], quantity);
-		// decrement quantity per part
+		if(haveParts == true) {
+			// add product
+			id = itemGateway.addItemProduct(prodTempID, InventoryItemModel.LOCATIONS[locationIndex], quantity);
+			// decrement quantity per part
+			for(ProductTemplatePartModel prodTempPart : prodTempParts) {
+				PartModel part = getPartByID(prodTempPart.getPartID());
+				InventoryItemModel item = getItemAtLocation(part.getPartID(), partsAtLocation);
+				editItem(item.getItemID(), part.getPartNumber(), item.getItemLocationIndex(), item.getItemQuantity()-prodTempPart.getPartQuantity(), item.getTimestamp());
+			}
+		} else {
+			throw new IllegalArgumentException("Not enough parts to create this product.");
+		}
 	}
 	
 	// ITEMS
-	public void addItem(String partNumber, int locationIndex, int quantity) throws SQLException {
+	public void addItem(String partNumber, int locationIndex, int quantity) throws SQLException, IllegalArgumentException {
 		int id = -1;
 		Timestamp t = null;
 		if(quantity == 0) {
 			throw new IllegalArgumentException("Item quantity must be zero or greater.");
+		}
+		if(locationIndex == 0) {
+			throw new IllegalArgumentException("Location must be set. Cannot be Unknown.");
 		}
 		if(this.isUniqueItem(partNumber, locationIndex)) {
 			PartModel part = getPartByNumber(partNumber);
@@ -265,7 +296,7 @@ public class InventoryModel {
 	
 	private boolean isUniqueItem(String partNumber, int locationIndex) { // checks for same part/location
 		for(InventoryItemModel item : inventory) {
-			if(item.getItemPart().getPartNumber().equals(partNumber) && item.getItemLocationIndex() == locationIndex) {
+			if(item.getItemPart() != null && item.getItemPart().getPartNumber().equals(partNumber) && item.getItemLocationIndex() == locationIndex) {
 				return false;
 			}
 		}
@@ -347,6 +378,15 @@ public class InventoryModel {
 		}
 		return null;
 	}
+	
+	public InventoryItemModel getItemAtLocation(int partID, int locationIndex) {
+		for(InventoryItemModel item : inventory) {
+			if(item.getItemPart().getPartID() == partID && item.getItemLocationIndex() == locationIndex) {
+				return item;
+			}
+		}
+		return null;
+	}
 
 	public PartModel getPartByID(int partID) {
 		for(PartModel part : parts) {
@@ -417,9 +457,9 @@ public class InventoryModel {
 		return templateNumbers;
 	}
 	
-	public int getQuantityByPartID(int partID) {
+	public int getQuantityAtLocation(int partID, int locationIndex) {
 		for(InventoryItemModel item : inventory) {
-			if(item.getItemPart().getPartID() == partID) {
+			if(item.getItemPart() != null && item.getItemPart().getPartID() == partID && item.getItemLocationIndex() == locationIndex) {
 				return item.getItemQuantity();
 			}
 		}

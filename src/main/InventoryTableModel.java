@@ -32,9 +32,17 @@ public class InventoryTableModel extends AbstractTableModel {
 			case "ITEMID":
 				return this.model.getInventoryItemByIndex(row).getItemID();
 			case "PART #":
-				//return this.model.getInventoryItemByIndex(row).getItemPart().getPartNumber();
+				if(this.model.getInventoryItemByIndex(row).getItemProductTemplateID() == 0) {
+					return this.model.getInventoryItemByIndex(row).getItemPart().getPartNumber();
+				} else {
+					return "----";
+				}
 			case "PROD #":
-				return this.model.getInventoryItemByIndex(row).getItemProductTemplateID();
+				if(this.model.getInventoryItemByIndex(row).getItemProductTemplateID() != 0) {
+					return this.model.getInventoryItemByIndex(row).getItemProductTemplateID();
+				} else {
+					return "----";
+				}
 			case "PART/PROD NAME":
 				if(this.model.getInventoryItemByIndex(row).getItemProductTemplateID() != 0) {
 					return model.getProductByID(model.getInventoryItemByIndex(row).getItemProductTemplateID()).getProductTemplateNumber();
