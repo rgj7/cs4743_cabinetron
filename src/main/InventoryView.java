@@ -4,7 +4,6 @@ import items.InventoryItemView;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.sql.SQLException;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;

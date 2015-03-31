@@ -17,7 +17,7 @@ import templateparts.ProductTemplatePartModel;
 import templates.ProductTemplateModel;
 
 public class InventoryModel {
-	public static final String[] ITEMFIELDS = {"ITEMID", "PART NUMBER", "PART NAME", "LOCATION", "QUANTITY"};
+	public static final String[] ITEMFIELDS = {"ITEMID", "PART #", "PROD #", "PART/PROD NAME", "LOCATION", "QUANTITY"};
 	public static final String[] PARTFIELDS = {"PARTID", "NUMBER", "NAME", "UNIT", "EXTERNAL", "VENDOR"};
 	public static final String[] PRODTEMPFIELDS = {"PTID", "NUMBER", "DESCRIPTION"};
 	
@@ -30,18 +30,19 @@ public class InventoryModel {
 	private ArrayList<PartModel> parts;
 	private ArrayList<ProductTemplateModel> productTemplates;
 	private ArrayList<ProductTemplatePartModel> prodTempParts;
+	
 	private int lastItemID, lastPartID, lastProdTempID;
 	private SessionModel session;
 	
 
 	public InventoryModel(PartTableGateway ptg, ItemTableGateway itg, ProductTemplateGateway pg, TemplatePartGateway tpg, SessionModel s) {
+
 		this.partGateway = ptg;
 		this.itemGateway = itg;
 		this.productGateway = pg;
 		this.templatePartGateway = tpg;
 		this.setSession(s);
 		this.prodTempParts = new ArrayList<ProductTemplatePartModel>();
-		//prodTempParts.add(new ProductTemplatePartModel(1,1,10));
 		
 		//loads parts from database
 		try {
@@ -65,7 +66,6 @@ public class InventoryModel {
 			e.printStackTrace();
 		}
 		
-
 		// get last id
 		this.lastItemID = itemGateway.getLastID() + 1;
 		this.lastPartID = partGateway.getLastID() + 1;
@@ -75,19 +75,71 @@ public class InventoryModel {
 	///////////
 	// METHODS
 	
-	// ITEMS
+	// PRODUCT
 	
-	public void addItem(String partNumber, int locationIndex, int quantity) throws SQLException {
+	public void addItemProduct(String templateNumber, int locationIndex, int quantity) throws SQLException, DatabaseLockException {
 		int id = -1;
 		Timestamp t = null;
 		if(quantity == 0) {
 			throw new IllegalArgumentException("Item quantity must be zero or greater.");
 		}
+		if(locationIndex == 0) {
+			throw new IllegalArgumentException("Location must be set. Cannot be Unknown.");
+		}
+		
+		ProductTemplateModel prodTemp = getProductTemplateByNumber(templateNumber);
+		int prodTempID = prodTemp.getProductTemplateID();
+		
+		// load template parts
+		loadTemplateParts(prodTempID);
+		
+		// check inventory quantity
+		boolean haveParts = false;
+		int partsAtLocation = 0;
+		// go through all locations
+		for(int i = 1; i <= 3; i++) {
+			haveParts = true;
+			for(ProductTemplatePartModel prodTempPart : prodTempParts) {
+				if(getQuantityAtLocation(prodTempPart.getPartID(), i) < prodTempPart.getPartQuantity()*quantity) {
+					haveParts = false;
+				}
+			}
+			// true if parts are all at one location
+			if(haveParts == true) {
+				partsAtLocation = i;
+				break;
+			}
+		}
+		
+		if(haveParts == true) {
+			// add product
+			id = itemGateway.addItemProduct(prodTempID, InventoryItemModel.LOCATIONS[locationIndex], quantity);
+			// decrement quantity per part
+			for(ProductTemplatePartModel prodTempPart : prodTempParts) {
+				PartModel part = getPartByID(prodTempPart.getPartID());
+				InventoryItemModel item = getItemAtLocation(part.getPartID(), partsAtLocation);
+				editItem(item.getItemID(), part.getPartNumber(), item.getItemLocationIndex(), item.getItemQuantity()-prodTempPart.getPartQuantity(), item.getTimestamp());
+			}
+		} else {
+			throw new IllegalArgumentException("Not enough parts to create this product.");
+		}
+	}
+	
+	// ITEMS
+	public void addItem(String partNumber, int locationIndex, int quantity) throws SQLException, IllegalArgumentException {
+		int id = -1;
+		Timestamp t = null;
+		if(quantity == 0) {
+			throw new IllegalArgumentException("Item quantity must be zero or greater.");
+		}
+		if(locationIndex == 0) {
+			throw new IllegalArgumentException("Location must be set. Cannot be Unknown.");
+		}
 		if(this.isUniqueItem(partNumber, locationIndex)) {
 			PartModel part = getPartByNumber(partNumber);
-			InventoryItemModel inventoryItem = new InventoryItemModel(lastItemID, part, locationIndex, quantity);
+			InventoryItemModel inventoryItem = new InventoryItemModel(lastItemID, part, 0, locationIndex, quantity);
 			
-			id = itemGateway.addItem(partNumber,InventoryItemModel.LOCATIONS[locationIndex], quantity);
+			id = itemGateway.addItem(partNumber, InventoryItemModel.LOCATIONS[locationIndex], quantity);
 			t = this.itemGateway.getTimeStamp(id);
             
 			inventoryItem.setTimestamp(t);
@@ -248,7 +300,7 @@ public class InventoryModel {
 	
 	private boolean isUniqueItem(String partNumber, int locationIndex) { // checks for same part/location
 		for(InventoryItemModel item : inventory) {
-			if(item.getItemPart().getPartNumber().equals(partNumber) && item.getItemLocationIndex() == locationIndex) {
+			if(item.getItemPart() != null && item.getItemPart().getPartNumber().equals(partNumber) && item.getItemLocationIndex() == locationIndex) {
 				return false;
 			}
 		}
@@ -266,7 +318,7 @@ public class InventoryModel {
 	
 	///////////
 	// GETTERS
-	
+		
 	public InventoryItemModel getInventoryItemByIndex(int index) {
 		return this.inventory.get(index);
 	}
@@ -281,7 +333,6 @@ public class InventoryModel {
 	
 	public void loadTemplateParts(int index) throws SQLException {
 		this.prodTempParts = templatePartGateway.loadTemplateParts(index);
-		System.out.println(this.prodTempParts.toString());
 	}
 	
 	public ProductTemplatePartModel getProdTempPartByIndex(int index) {
@@ -331,6 +382,15 @@ public class InventoryModel {
 		}
 		return null;
 	}
+	
+	public InventoryItemModel getItemAtLocation(int partID, int locationIndex) {
+		for(InventoryItemModel item : inventory) {
+			if(item.getItemPart() != null && item.getItemPart().getPartID() == partID && item.getItemLocationIndex() == locationIndex) {
+				return item;
+			}
+		}
+		return null;
+	}
 
 	public PartModel getPartByID(int partID) {
 		for(PartModel part : parts) {
@@ -350,7 +410,14 @@ public class InventoryModel {
 		return null;
 	}
 	
-	
+	public ProductTemplateModel getProductTemplateByNumber(String templateNumber) {
+		for(ProductTemplateModel product : productTemplates) {
+			if(product.getProductTemplateNumber().equals(templateNumber)) {
+				return product;
+			}
+		}
+		return null;
+	}
 	
 	public PartModel getPartByName(String name) {
 		for(PartModel part : parts) {
@@ -386,30 +453,47 @@ public class InventoryModel {
 		return partNumbers;
 	}
 	
+	public String[] getTemplateNumbers() {
+		String[] templateNumbers = new String[productTemplates.size()];
+		for(int i = 0; i<productTemplates.size(); i++) {
+			templateNumbers[i] = productTemplates.get(i).getProductTemplateNumber();
+		}
+		return templateNumbers;
+	}
+	
+	public int getQuantityAtLocation(int partID, int locationIndex) {
+		for(InventoryItemModel item : inventory) {
+			if(item.getItemPart() != null && item.getItemPart().getPartID() == partID && item.getItemLocationIndex() == locationIndex) {
+				return item.getItemQuantity();
+			}
+		}
+		return 0;
+	}
+	
 	public void reloadInventory(){
 		//loads parts from database
-				try {
-					this.parts = partGateway.loadParts();
-					parts.toString();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				
-				try {
-					this.inventory = itemGateway.loadItems();
-				} catch (SQLException e) {
-					System.out.println("load items exception");
-					e.printStackTrace();
-				}
-				
-				try {
-					this.productTemplates = productGateway.loadProducts();
-				} catch (SQLException e){
-					e.printStackTrace();
-				}
-				
-				this.lastItemID = itemGateway.getLastID() + 1; // TODO: get last item id from database
-				this.lastPartID = partGateway.getLastID() + 1;
+		try {
+			this.parts = partGateway.loadParts();
+			parts.toString();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			this.inventory = itemGateway.loadItems();
+		} catch (SQLException e) {
+			System.out.println("load items exception");
+			e.printStackTrace();
+		}
+		
+		try {
+			this.productTemplates = productGateway.loadProducts();
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		
+		this.lastItemID = itemGateway.getLastID() + 1; // TODO: get last item id from database
+		this.lastPartID = partGateway.getLastID() + 1;
 	}
 
 	public SessionModel getSession() {

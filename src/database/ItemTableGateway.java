@@ -24,16 +24,11 @@ import database.DatabaseLockException;
 public class ItemTableGateway {
 	
 	private Connection conn;
-	PreparedStatement sRS;
-	private ResultSet rs;
 	private PartTableGateway partGateway;
 	private int lastID;
-
 	
-
-	public ItemTableGateway(PartTableGateway partGateway) throws GatewayException{
-		
-		//read the properties file to establish the db connection
+	public ItemTableGateway(PartTableGateway partGateway) throws GatewayException {
+		// read the properties file to establish the db connection
 		DataSource ds = getDataSource();
 		if(ds == null) {
         	throw new GatewayException("Datasource is null!");
@@ -70,61 +65,88 @@ public class ItemTableGateway {
 	
 	
 	public ArrayList<InventoryItemModel> loadItems() throws SQLException {
-		sRS = null;
-		rs = null;
-		ArrayList<InventoryItemModel> items= new ArrayList<InventoryItemModel>();
+		PreparedStatement q;
+		ResultSet rs;
+
+		ArrayList<InventoryItemModel> items = new ArrayList<InventoryItemModel>();
      		
-        sRS = conn.prepareStatement("select * from item");
-        rs = sRS.executeQuery();
-        rs.first();
-       
-    	boolean moreItems = false;
-        do{
-        	InventoryItemModel i = null;
-        	PartModel p = null;
+        q = conn.prepareStatement("SELECT * FROM item");
+        rs = q.executeQuery();
+        
+        while(rs.next()) {
+        	PartModel part = null;
+        	// get values from db
         	int id = rs.getInt("id");
         	String location = rs.getString("location");
-        	int quant = rs.getInt("quantity");
-        	int partId = rs.getInt("part_id");
-        	p = partGateway.getPart(partId);
+        	int quantity = rs.getInt("quantity");
+        	int part_id = rs.getInt("part_id");
+        	if(part_id != 0) {
+        		part = partGateway.getPart(part_id);
+        	}
+        	int template_id = rs.getInt("template_id");
         	Timestamp time = rs.getTimestamp("time");
-        	i = new InventoryItemModel(id, p, Arrays.asList(InventoryItemModel.LOCATIONS).indexOf(location), quant, time);
-        	items.add(i);
-		    moreItems = rs.next();
+        	// create model objects
+        	InventoryItemModel item = new InventoryItemModel(id, part, template_id, Arrays.asList(InventoryItemModel.LOCATIONS).indexOf(location), quantity, time);
+        	items.add(item);
 		    this.lastID = id;
-        } while(moreItems);
-        
+        }
         return items;
 	}
 	
-	public int getLastID(){
+	public int getLastID() {
 		return this.lastID;
 	}
 	
-	public Timestamp getTimeStamp(int id) throws SQLException{
-		sRS = null;
-		rs = null;
-	    sRS = conn.prepareStatement("SELECT * from item " +
-		                            "WHERE id = ?");
-	    sRS.setInt(1, id);
-	    rs = sRS.executeQuery();
+	public Timestamp getTimeStamp(int id) throws SQLException {
+		PreparedStatement q;
+		ResultSet rs;
+		
+	    q = conn.prepareStatement("SELECT * FROM item WHERE id = ?");
+	    q.setInt(1, id);
+	    rs = q.executeQuery();
+	    
 	    rs.first();
-	    Timestamp t = rs.getTimestamp("time");
-	    return t;
+	    Timestamp ts = rs.getTimestamp("time");
+	    return ts;
 	}
 	
-	public int addItem(String part_num, String location, int quantity) throws SQLException{
-		sRS = null;
-		rs = null;
+	public int addItem(String part_num, String location, int quantity) throws SQLException {
+		PreparedStatement q;
+		ResultSet rs;
+		
 		int id = -1;
 	    int part_id = partGateway.getPartId(part_num);
-	    sRS = conn.prepareStatement("insert into item (location, quantity, part_id) "
+	    
+	    q = conn.prepareStatement("insert into item (location, quantity, part_id) "
 				+ " values (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-		sRS.setString(1, location);
-		sRS.setInt(2, quantity);
-		sRS.setInt(3, part_id);
-		sRS.execute();
-		rs = sRS.getGeneratedKeys();
+		q.setString(1, location);
+		q.setInt(2, quantity);
+		q.setInt(3, part_id);
+		q.execute();
+		
+		rs = q.getGeneratedKeys();
+		
+		while(rs.next())
+			id = rs.getInt(1);
+	
+		return id;
+	}
+	
+	public int addItemProduct(int template_id, String location, int quantity) throws SQLException {
+		PreparedStatement q;
+		ResultSet rs;
+		
+		int id = -1;
+	    
+	    q = conn.prepareStatement("insert into item (location, quantity, template_id) "
+				+ " values (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+		q.setString(1, location);
+		q.setInt(2, quantity);
+		q.setInt(3, template_id);
+		q.execute();
+		
+		rs = q.getGeneratedKeys();
+		
 		while(rs.next())
 			id = rs.getInt(1);
 	
@@ -134,20 +156,20 @@ public class ItemTableGateway {
 	public void editItem(int id, String part_num, String location, int quantity,
 			             Timestamp timestmp) throws SQLException, DatabaseLockException{
 		int count = 0;
-		sRS = null;
+		PreparedStatement q;
 		
 		System.out.println(timestmp.toString()); //TESTING
 		System.out.println(this.getTimeStamp(id).toString()); //TESTING
 		int part_id = partGateway.getPartId(part_num);
-		sRS = conn.prepareStatement("UPDATE item " +
+		q = conn.prepareStatement("UPDATE item " +
 		                            "SET location = ?, quantity = ?, part_id = ?" + 
 				                    " WHERE id = ? AND time = ?");
-		sRS.setString(1, location);
-		sRS.setInt(2, quantity);
-		sRS.setInt(3, part_id);
-		sRS.setInt(4, id);
-		sRS.setTimestamp(5, timestmp);
-		count = sRS.executeUpdate();
+		q.setString(1, location);
+		q.setInt(2, quantity);
+		q.setInt(3, part_id);
+		q.setInt(4, id);
+		q.setTimestamp(5, timestmp);
+		count = q.executeUpdate();
 		
 		if ( count < 1){
 			throw new DatabaseLockException("Item out of Sync. Retry Item Edit");
@@ -156,10 +178,11 @@ public class ItemTableGateway {
 	}
 	
 	public void deleteItem(int id) throws SQLException{
-		sRS = null;
-		sRS = conn.prepareStatement("DELETE FROM item WHERE id = ?");
-		sRS.setInt(1, id);
-		sRS.execute();
+		PreparedStatement q;
+
+		q = conn.prepareStatement("DELETE FROM item WHERE id = ?");
+		q.setInt(1, id);
+		q.execute();
 	}
 	
 	

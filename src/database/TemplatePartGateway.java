@@ -1,5 +1,4 @@
 package database;
-import items.InventoryItemModel;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,30 +7,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import parts.PartModel;
 import templateparts.ProductTemplatePartModel;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
-import database.DatabaseLockException;
-
 public class TemplatePartGateway {
 	
 	private Connection conn;
-	PreparedStatement sRS;
-	private ResultSet rs;
-	private PartTableGateway partGateway;
-	
 
 	public TemplatePartGateway() throws GatewayException{
-		
 		//read the properties file to establish the db connection
 		DataSource ds = getDataSource();
 		if(ds == null) {
@@ -42,7 +31,6 @@ public class TemplatePartGateway {
 		} catch (SQLException e) {
 			throw new GatewayException("SQL Error: " + e.getMessage());
 		}
-		this.partGateway = partGateway;
 	}
 	
 	public DataSource getDataSource() {
@@ -67,64 +55,57 @@ public class TemplatePartGateway {
         }
 	}
 	
-	
 	public ArrayList<ProductTemplatePartModel> loadTemplateParts(int id) throws SQLException {
-		sRS = null;
-		rs = null;
+		PreparedStatement query;
+		ResultSet rs;	
+		
 		ArrayList<ProductTemplatePartModel> templateParts = new ArrayList<ProductTemplatePartModel>();
      		
-        sRS = conn.prepareStatement("SELECT * from template_part "
+		query = conn.prepareStatement("SELECT * from template_part "
         		                  + "WHERE template_id = ?");
-        sRS.setInt(1,id);
-        rs = sRS.executeQuery();
-        //rs.first();
-       
-    	//boolean moreTParts = false;
-        //do{
+		query.setInt(1,id);
+        rs = query.executeQuery();
+
         while(rs.next()) {
-        	ProductTemplatePartModel i = null;
         	int temp_id = rs.getInt("template_id");     
         	int quant = rs.getInt("quantity");
         	int partId = rs.getInt("part_id");
-        	i = new ProductTemplatePartModel(temp_id, partId, quant);
+        	ProductTemplatePartModel i = new ProductTemplatePartModel(temp_id, partId, quant);
         	templateParts.add(i);
-		    //moreTParts = rs.next();
-        //} while(moreTParts);
         }
-        
         return templateParts;
 	}
 	
 
 	public void addTemplatePart(int temp_id, int part_id, int quant) throws SQLException{
-		sRS = null;
-		rs = null;
-	    sRS = conn.prepareStatement("insert into template_part (template_id, quantity, part_id) "
+		PreparedStatement query;
+		
+		query = conn.prepareStatement("insert into template_part (template_id, quantity, part_id) "
 				+ " values (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-		sRS.setInt(1, temp_id);
-		sRS.setInt(2, quant);
-		sRS.setInt(3, part_id);
-		sRS.execute();
+		query.setInt(1, temp_id);
+		query.setInt(2, quant);
+		query.setInt(3, part_id);
+		query.execute();
 	}
 	
 	public void editTemplatePart(int temp_id, int part_id, int quant) throws SQLException {
-
-		sRS = null;
-		sRS = conn.prepareStatement("UPDATE  template_part" +
+		PreparedStatement query;
+		query = conn.prepareStatement("UPDATE  template_part" +
 		                            "SET quantity = ?, part_id = ?" + 
 				                    " WHERE template_id = ?");
-		sRS.setInt(1, quant);
-		sRS.setInt(2, part_id);
-		sRS.setInt(3, temp_id);
-		sRS.executeUpdate();			
+		query.setInt(1, quant);
+		query.setInt(2, part_id);
+		query.setInt(3, temp_id);
+		query.executeUpdate();			
 	}
 	
 	public void deleteTemplatePart(int temp_id, int part_id) throws SQLException{
-		sRS = null;
-		sRS = conn.prepareStatement("DELETE FROM template_part WHERE template_id = ? AND part_id = ?");
-		sRS.setInt(1, temp_id);
-		sRS.setInt(2, part_id);
-		sRS.execute();
+		PreparedStatement query;
+		query = conn.prepareStatement("DELETE FROM template_part " +
+										"WHERE template_id = ? AND part_id = ?");
+		query.setInt(1, temp_id);
+		query.setInt(2, part_id);
+		query.execute();
 	}
 	
 	
