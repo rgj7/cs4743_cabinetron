@@ -18,8 +18,12 @@ public class PartTableController implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		if(arg0.getClickCount() == 2) {
-			PartDetailView partView = new PartDetailView(model, view, view.getSelectedPartRow());
-			partView.registerListeners(new PartController(model, view, partView));
+			if(!model.getSession().canAddParts()){
+				view.showMessage("Access Denied. \n You do not have access to this action");
+			} else {
+				PartDetailView partView = new PartDetailView(model, view, view.getSelectedPartRow());
+				partView.registerListeners(new PartController(model, view, partView));
+			}
 		}
 	}
 

@@ -21,8 +21,12 @@ public class InventoryTableController implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(e.getClickCount() == 2) {
-			InventoryItemDetailView itemView = new InventoryItemDetailView(model, view, view.getSelectedInventoryItemRow());
-			itemView.registerListeners(new InventoryItemController(model, view, itemView));
+			if(!model.getSession().canAddInventory()){
+				view.showMessage("Access Denied. \n You do not have access to this action");
+			} else {
+			   InventoryItemDetailView itemView = new InventoryItemDetailView(model, view, view.getSelectedInventoryItemRow());
+			   itemView.registerListeners(new InventoryItemController(model, view, itemView));
+			}
 		}
 	}
 

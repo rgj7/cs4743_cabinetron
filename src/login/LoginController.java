@@ -35,5 +35,10 @@ public class LoginController implements ActionListener {
 				loginView.close();
 
 		}
+		else if(command.equals("Guest")) {
+			authenticator.setGuest();
+			this.actionOccured = true;
+			loginView.close();
+		}
 	}
 }

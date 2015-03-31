@@ -70,5 +70,11 @@ public class AuthenticatorModel {
 	public SessionModel getSession(){
 		return this.session;
 	}
+
+	public void setGuest() {
+		UserModel g = new UserModel("Basic User", "");
+		SessionModel guest = new SessionModel(g, false, false, false);
+		this.setSession(guest);
+	}
 	
 }

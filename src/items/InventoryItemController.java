@@ -59,13 +59,17 @@ public class InventoryItemController implements ActionListener {
 			} 	
 	       
 		} else if(command.equals("Delete Item")) {
-			if(view.showWarningMsg("Are you sure you want to delete this item?") == 0) {
-				try {
-					model.deleteItem(itemView.getItemID());
-				} catch(SQLException e) {
-					view.showMessage(e.getMessage());
-				} catch(IllegalArgumentException e) {
-					view.showMessage(e.getMessage());
+			if(!model.getSession().canDeleteInventory()){
+				view.showMessage("Access Denied. \n You do not have access to this action");
+			} else {
+				if(view.showWarningMsg("Are you sure you want to delete this item?") == 0) {
+					try {
+						model.deleteItem(itemView.getItemID());
+					} catch(SQLException e) {
+						view.showMessage(e.getMessage());
+					} catch(IllegalArgumentException e) {
+						view.showMessage(e.getMessage());
+					}
 				}
 			}
 			itemView.close();

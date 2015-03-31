@@ -107,6 +107,6 @@ public class SessionModel {
 		if(admin){
 			return "Administrator";
 		}
-		else return "Unknown";
+		else return "Guest";
 	}
 }
