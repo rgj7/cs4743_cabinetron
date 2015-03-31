@@ -76,6 +76,25 @@ public class TemplatePartGateway {
         return templateParts;
 	}
 	
+	public ArrayList<ProductTemplatePartModel> loadAllTemplateParts() throws SQLException {
+		PreparedStatement query;
+		ResultSet rs;	
+		
+		ArrayList<ProductTemplatePartModel> templateParts = new ArrayList<ProductTemplatePartModel>();
+     		
+		query = conn.prepareStatement("SELECT * from template_part");
+        rs = query.executeQuery();
+
+        while(rs.next()) {
+        	int temp_id = rs.getInt("template_id");     
+        	int quant = rs.getInt("quantity");
+        	int partId = rs.getInt("part_id");
+        	ProductTemplatePartModel i = new ProductTemplatePartModel(temp_id, partId, quant);
+        	templateParts.add(i);
+        }
+        return templateParts;
+	}
+	
 
 	public void addTemplatePart(int temp_id, int part_id, int quant) throws SQLException{
 		PreparedStatement query;

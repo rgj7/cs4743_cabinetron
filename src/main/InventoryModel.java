@@ -236,7 +236,7 @@ public class InventoryModel {
 				e.printStackTrace();
 			}
 		} else {
-			throw new IllegalArgumentException("You must delete any inventory items associated with part first.");
+			throw new IllegalArgumentException("You must delete any inventory items or product templates associated with part first.");
 		}
 	}
 	
@@ -337,8 +337,14 @@ public class InventoryModel {
 		return false;
 	}
 	
-	private boolean partInTemplates(int partId) {
-		return (Boolean) null;
+	private boolean partInTemplates(int partId) throws SQLException {
+		ArrayList<ProductTemplatePartModel> templateParts = templatePartGateway.loadAllTemplateParts();
+		for(ProductTemplatePartModel part : templateParts) {
+			if(part.getPartID() == partId) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	///////////
