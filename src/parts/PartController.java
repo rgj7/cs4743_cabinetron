@@ -50,11 +50,15 @@ public class PartController implements ActionListener {
 			}
 			
 		} else if(command.equals("Delete Part")) {
-			if(view.showWarningMsg("Are you sure you want to delete this part?") == 0) {
-				try {
-					model.deletePart(partView.getPartID());
-				} catch (SQLException e) {
-					view.showMessage(e.getMessage());
+			if(!model.getSession().canDeleteParts()){
+				view.showMessage("Access Denied. \n You do not have access to this action");
+			} else {
+				if(view.showWarningMsg("Are you sure you want to delete this part?") == 0) {
+					try {
+						model.deletePart(partView.getPartID());
+					} catch (SQLException e) {
+						view.showMessage(e.getMessage());
+					}
 				}
 			}
 			partView.close();

@@ -49,7 +49,9 @@ public class LoginView extends JFrame {
 
 		JButton loginButton = new JButton("Login");
 		formPanel.add(loginButton, "skip, split 2");
-
+        
+		JButton guestButton = new JButton("Guest");
+		formPanel.add(guestButton, "skip, split 2");
 		
 		add(formPanel);
 		pack(); // sizes window to fit components
