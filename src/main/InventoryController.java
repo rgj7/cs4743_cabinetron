@@ -32,7 +32,7 @@ public class InventoryController implements ActionListener {
 						
 		} else if(command.equals("Add Item to Inventory")) {
 			
-			if(!model.getSession().canAddInventory()){
+			if(!model.getSession().canAddInventory() && !model.getSession().canCreateProducts()){
 				view.showMessage("Access Denied. \n You do not have access to this action");
 			}
 			else{
