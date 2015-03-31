@@ -56,7 +56,7 @@ public class PartController implements ActionListener {
 				if(view.showWarningMsg("Are you sure you want to delete this part?") == 0) {
 					try {
 						model.deletePart(partView.getPartID());
-					} catch (SQLException e) {
+					} catch (IllegalArgumentException | SQLException e) {
 						view.showMessage(e.getMessage());
 					}
 				}

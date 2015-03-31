@@ -221,41 +221,44 @@ public class InventoryModel {
 		partGateway.editPart(id, number, name, PartModel.UNITS[unitIndex], externalNumber, vendor);
 	}
 	
-	public void deletePart(int partId) throws SQLException {
+	public void deletePart(int partId) throws SQLException, IllegalArgumentException {
 		
-		partGateway.deletePart(partId);
-		
-		// TODO: need to deal with deleting part that is referenced in inventory
-		// ( db may handle it on its own but would need to resync with db)
-		try {
-			parts = partGateway.loadParts();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if(!partInInventory(partId) && !partInTemplates(partId)) {
+			partGateway.deletePart(partId);
+			try {
+				parts = partGateway.loadParts();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				inventory = itemGateway.loadItems();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} else {
+			throw new IllegalArgumentException("You must delete any inventory items associated with part first.");
 		}
-		try {
-			inventory = itemGateway.loadItems();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
 	}
 	
 	// PRODUCT TEMPLATES
 	
 	public void addProductTemplate(String name, String desc) {
 		int id = -1;
-		
-		ProductTemplateModel newProdTemp = new ProductTemplateModel(id, name, desc);
-		
-		try{
-			id = productGateway.addTemplate(name, desc);		
-		} catch (SQLException e){
-			e.printStackTrace();
+		if(isUniqueTemplate(name)) {
+			ProductTemplateModel newProdTemp = new ProductTemplateModel(id, name, desc);
+			
+			try{
+				id = productGateway.addTemplate(name, desc);		
+			} catch (SQLException e){
+				e.printStackTrace();
+			}
+		    
+			newProdTemp.setProductTemplateID(id);
+			productTemplates.add(newProdTemp);
+		    this.lastProdTempID++;
+		} else {
+			throw new IllegalArgumentException("PRODUCT TEMPLATE NUMBER already exists in product template list.");
 		}
-	    
-		newProdTemp.setProductTemplateID(id);
-		productTemplates.add(newProdTemp);
-	    this.lastProdTempID++;
 	}
 	
 	
@@ -314,6 +317,28 @@ public class InventoryModel {
 			}
 		}
 		return true;
+	}
+	
+	private boolean isUniqueTemplate(String templateNumber) { // checks for existing part number
+		for(ProductTemplateModel prodTemp : productTemplates) {
+			if(prodTemp.getProductTemplateNumber().equals(templateNumber)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean partInInventory(int partId) {
+		for(InventoryItemModel item : inventory) {
+			if(item.getItemPart() != null && item.getItemPart().getPartID() == partId) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean partInTemplates(int partId) {
+		return (Boolean) null;
 	}
 	
 	///////////
