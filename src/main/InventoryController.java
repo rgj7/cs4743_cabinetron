@@ -26,26 +26,65 @@ public class InventoryController implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		String command = event.getActionCommand();
 		if(command.equals("Exit")) {
+			System.out.println("Exit");
 			view.dispose();
 			System.exit(0);
+						
 		} else if(command.equals("Add Item to Inventory")) {
-			InventoryItemDetailView itemView = new InventoryItemDetailView(model, view, model.getLastItemID()); // sets item id to next available id
-			itemView.registerListeners(new InventoryItemController(model, view, itemView));
+			
+			if(!model.getSession().canAddInventory()){
+				view.showMessage("Access Denied. \n You do not have access to this action");
+			}
+			else{
+				InventoryItemDetailView itemView = new InventoryItemDetailView(model, view, model.getLastItemID()); // sets item id to next available id
+				itemView.registerListeners(new InventoryItemController(model, view, itemView));
+			}
+			
 		} else if(command.equals("Add Part to Parts List")) {
-			PartDetailView partView = new PartDetailView(model, view, model.getLastPartID()); // sets part id to next available id
-			partView.registerListeners(new PartController(model, view, partView));
+			
+			if(!model.getSession().canAddParts()){
+				view.showMessage("Access Denied. \n You do not have access to this action");
+			}
+			else{
+				PartDetailView partView = new PartDetailView(model, view, model.getLastPartID()); // sets part id to next available id
+				partView.registerListeners(new PartController(model, view, partView));
+			}
+			
 		} else if(command.equals("Add Product Template")) {
-			ProductTemplateDetailView prodTempView = new ProductTemplateDetailView(model, view, model.getLastProductTemplateID());
-			prodTempView.registerListeners(new ProductTemplateController(model, view, prodTempView));
-		} else if(command.equals("View Inventory")) {
-			view.getTabbedPane().setSelectedIndex(0);
-			view.update();
+			if(!model.getSession().canAddProductTemplates()){
+				view.showMessage("Access Denied. \n You do not have access to this action");
+			}
+			else{
+				ProductTemplateDetailView prodTempView = new ProductTemplateDetailView(model, view, model.getLastProductTemplateID());
+				prodTempView.registerListeners(new ProductTemplateController(model, view, prodTempView));
+			}
+			
+		}else if(command.equals("View Inventory")) {
+			if(!model.getSession().canViewInventory()){
+				view.showMessage("Access Denied. \n You do not have access to this action");
+			}
+			else{
+				view.getTabbedPane().setSelectedIndex(0);
+				view.update();
+			}
+			
 		} else if(command.equals("View All Parts")) {
-			view.getTabbedPane().setSelectedIndex(1);
-			view.update();
+			if(!model.getSession().canViewParts()){
+				view.showMessage("Access Denied. \n You do not have access to this action");
+			}
+			else{
+				view.getTabbedPane().setSelectedIndex(1);
+				view.update();
+			}
+		
 		} else if(command.equals("View All Product Templates")) {
+			if(!model.getSession().canViewProductTemplates()){
+				view.showMessage("Access Denied. \n You do not have access to this action");	
+			}
+			else{
 			view.getTabbedPane().setSelectedIndex(2);
 			view.update();
+			}
 		}
 	}
 }

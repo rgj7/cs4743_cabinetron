@@ -31,7 +31,7 @@ import templates.ProductTemplateView;
 public class InventoryView extends JFrame {	
 
 	private InventoryModel model;
-	private JMenu inventoryMenu, partsMenu, prodTempMenu;
+	private JMenu userMenu, inventoryMenu, partsMenu, prodTempMenu;
 	private JTabbedPane tabbedPane;
 	private JTable currentTable;
 	
@@ -43,11 +43,11 @@ public class InventoryView extends JFrame {
 	// CONSTRUCTOR
 	
 	public InventoryView(InventoryModel model)  {
-		// set window title
-		super("Cabinentron Inventory");
-
+		
+		super(model.getSession().getUser().getName() + " - " + model.getSession().getPosition() + ":  Cabinentron Inventory");
 		this.model = model;
 		
+	
 		initMenu();
 
 		// initialize tab panel
@@ -66,12 +66,22 @@ public class InventoryView extends JFrame {
 		
 		// add tab panel to frame
 		add(tabbedPane, BorderLayout.CENTER);
+		if(!model.getSession().canViewProductTemplates())
+		tabbedPane.setEnabledAt(2, false);
 	}
-	
-	public void initMenu() {
+
+ void initMenu() {
 		// initialize menu bar
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
+		
+	    //user
+		userMenu = new JMenu("User");
+		menuBar.add(userMenu);
+		
+		JMenuItem exitMenuItem = new JMenuItem("Exit");
+		
+		userMenu.add(exitMenuItem);
 		
 		// inventory
 		inventoryMenu = new JMenu("Inventory");
@@ -79,11 +89,11 @@ public class InventoryView extends JFrame {
 		
 		JMenuItem addItemMenuItem = new JMenuItem("Add Item to Inventory");
 		JMenuItem viewInventoryMenuItem = new JMenuItem("View Inventory");
-		JMenuItem exitMenuItem = new JMenuItem("Exit");
+
 		
 		inventoryMenu.add(addItemMenuItem);
 		inventoryMenu.add(viewInventoryMenuItem);
-		inventoryMenu.add(exitMenuItem);
+
 		
 		// parts
 		partsMenu = new JMenu("Parts");
@@ -147,7 +157,16 @@ public class InventoryView extends JFrame {
 	
 	public void registerListeners(InventoryController controller1, InventoryTableController controller2) {	
 		// register action listeners for menu items
-		Component[] components = inventoryMenu.getMenuComponents();
+		
+		Component[] components = userMenu.getMenuComponents();
+		for(Component component : components) {
+			if(component instanceof AbstractButton) {
+				AbstractButton button = (AbstractButton) component;
+				button.addActionListener(controller1);
+			}
+		}
+		
+		components = inventoryMenu.getMenuComponents();
 		for(Component component : components) {
 			if(component instanceof AbstractButton) {
 				AbstractButton button = (AbstractButton) component;

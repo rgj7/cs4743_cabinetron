@@ -26,7 +26,7 @@ public class LoginView extends JFrame {
 		super("Login");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
-		MigLayout layout = new MigLayout("wrap 2", "[right]10[grow,fill]", "[]10[]");
+		MigLayout layout = new MigLayout("wrap 2", "[right]10[fill, 150]", "[]10[]");
 		formPanel = new JPanel(layout);
 		
 		

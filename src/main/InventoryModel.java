@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import login.SessionModel;
 import database.DatabaseLockException;
 import database.ItemTableGateway;
 import database.PartTableGateway;
@@ -30,14 +31,15 @@ public class InventoryModel {
 	private ArrayList<ProductTemplateModel> productTemplates;
 	private ArrayList<ProductTemplatePartModel> prodTempParts;
 	private int lastItemID, lastPartID, lastProdTempID;
+	private SessionModel session;
 	
 
-	public InventoryModel(PartTableGateway ptg, ItemTableGateway itg, ProductTemplateGateway pg, TemplatePartGateway tpg) {
+	public InventoryModel(PartTableGateway ptg, ItemTableGateway itg, ProductTemplateGateway pg, TemplatePartGateway tpg, SessionModel s) {
 		this.partGateway = ptg;
 		this.itemGateway = itg;
 		this.productGateway = pg;
 		this.templatePartGateway = tpg;
-		
+		this.setSession(s);
 		this.prodTempParts = new ArrayList<ProductTemplatePartModel>();
 		//prodTempParts.add(new ProductTemplatePartModel(1,1,10));
 		
@@ -408,5 +410,13 @@ public class InventoryModel {
 				
 				this.lastItemID = itemGateway.getLastID() + 1; // TODO: get last item id from database
 				this.lastPartID = partGateway.getLastID() + 1;
+	}
+
+	public SessionModel getSession() {
+		return session;
+	}
+
+	public void setSession(SessionModel session) {
+		this.session = session;
 	}
 }

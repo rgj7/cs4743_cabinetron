@@ -97,5 +97,16 @@ public class SessionModel {
 		this.user = user;
 	}
 	
-	
+	public String getPosition(){
+		if(inventoryManager){
+			return "Inventory Manager";
+		}
+		if(productManager){
+			return "Product Manager";
+		}
+		if(admin){
+			return "Administrator";
+		}
+		else return "Unknown";
+	}
 }

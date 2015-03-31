@@ -22,6 +22,7 @@ public class Inventory {
 		   boolean actionOccured = false;
 		   AuthenticatorModel authenticator = new AuthenticatorModel(session);
 		   LoginView loginview = new LoginView();
+		   loginview.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		   LoginController loginController = new LoginController(authenticator, loginview);
 		   loginview.registerListeners(loginController);
 		   while(!loginController.hasActionOccured()){
@@ -75,7 +76,7 @@ public class Inventory {
 		}
 		
 		// model
-		InventoryModel model = new InventoryModel(ptg, itg, pg, tpg);
+		InventoryModel model = new InventoryModel(ptg, itg, pg, tpg, session);
 		// view
 		InventoryView view = new InventoryView(model);
 		// controllers
