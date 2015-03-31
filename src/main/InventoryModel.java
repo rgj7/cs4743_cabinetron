@@ -381,7 +381,7 @@ public class InventoryModel {
 	
 	public InventoryItemModel getItemAtLocation(int partID, int locationIndex) {
 		for(InventoryItemModel item : inventory) {
-			if(item.getItemPart().getPartID() == partID && item.getItemLocationIndex() == locationIndex) {
+			if(item.getItemPart() != null && item.getItemPart().getPartID() == partID && item.getItemLocationIndex() == locationIndex) {
 				return item;
 			}
 		}
