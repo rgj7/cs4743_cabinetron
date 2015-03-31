@@ -33,13 +33,22 @@ public class InventoryItemController implements ActionListener {
 			
 			try {
 				if(itemView.getItemType().equals("Part")) {
+					if(!model.getSession().canAddParts()){
+						view.showMessage("Access Denied. \n You do not have access to this action");
+					} else {
 					model.addItem(itemView.getItemPartNumber(), itemView.getItemLocationIndex(), itemView.getItemQuantity());
+					view.showMessage("Item was added successfully.");
+					}
 				} else if(itemView.getItemType().equals("Product")) {
+					if(!model.getSession().canCreateProducts()){
+						view.showMessage("Access Denied. \n You do not have access to this action");
+					} else {
 					model.addItemProduct(itemView.getItemTemplateNumber(), itemView.getItemLocationIndex(), itemView.getItemQuantity());
+					view.showMessage("Item was added successfully.");
+					}
 				}
 				itemView.close();
 				view.update();
-				view.showMessage("Item was added successfully.");
 			} catch(IllegalArgumentException | SQLException | DatabaseLockException e) {
 				view.showMessage(e.getMessage());
 			}
